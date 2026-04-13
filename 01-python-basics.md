@@ -3,6 +3,13 @@
 ## 1. Python là gì?
 Python là một ngôn ngữ lập trình bậc cao, thông dịch (interpreted) và đa năng. Điểm đặc trưng lớn nhất là cú pháp cực kỳ ngắn gọn và dễ đọc.
 
+- **Thông dịch (Interpreted) vs Biên dịch (Compiled):**
+    - **Biên dịch:** Bước "Dịch ra file" thường làm trước khi chạy (giai đoạn Build). Khi "Run" là bạn chỉ việc kích hoạt cái file đã có sẵn đó thôi (nên nó cực nhanh).
+    - **Thông dịch:** Bước "Dịch" và "Chạy" xảy ra cùng lúc ngay khi bạn nhấn Run.
+    - **Tóm lại:** 
+        - **Thông dịch:** Là "vừa dịch vừa chạy" (Live).
+        - **Biên dịch:** Là "dịch xong xuôi, đóng gói rồi mới chạy" (Pre-packaged).
+
 - **Đa nền tảng:** Python có thể chạy được trên nhiều hệ điều hành khác nhau như Windows, Mac, Linux...
 - **Cú pháp thụt lề (Indentation):** Thay vì dùng dấu ngoặc nhọn {} để phân chia khối lệnh như JavaScript, Python dùng khoảng trắng (thụt đầu dòng). Đây là quy tắc bắt buộc để code chạy đúng.
 - **Dynamic Typing:** Giống như JavaScript, bạn không cần khai báo kiểu dữ liệu cho biến, nhưng Python là ngôn ngữ "Strongly Typed" (không tự động ép kiểu linh hoạt như JS).
