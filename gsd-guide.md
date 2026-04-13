@@ -82,3 +82,23 @@ Phần này bổ sung thêm các nhóm lệnh giúp bạn làm chủ quy trình 
 💡 **Mẹo dọn dẹp**: Hôm nào rảnh rỗi dọn rác dự án dư âm, gõ `/gsd-cleanup`, AI sẽ đi dọn dẹp lại các thư mục nháp hay file log không cần thiết. Đừng ngần ngại khám phá các lệnh mồi này, nó sẽ luyện cho bạn kỹ năng dùng Tool cực bén!
 
 > **Lời khuyên cuối**: Hãy bắt đầu bằng lệnh `/gsd-help` ngay trong Antigravity để AI của bạn hiển thị danh sách lệnh và xác nhận nó đã sẵn sàng đồng hành cùng bạn theo quy trình này!
+
+---
+
+## 6. Mẹo nhỏ để không bao giờ phải nhớ lệnh
+
+### Cách 1: Chỉ cần kể vấn đề, để GSD tự tìm lệnh (Khuyên dùng)
+GSD đã lường trước việc bạn không thể nhớ nổi hơn 60 lệnh khác nhau, nên họ tạo sẵn một lệnh Trung chuyển tự động mang tên:
+
+👉 `/gsd-do <Ghi bằng tiếng Việt điều bạn đang muốn làm>`
+
+**Ví dụ:**
+Bạn gõ: `/gsd-do Hôm nay tao muốn làm nốt cái chức năng Quên mật khẩu lúc qua bỏ dở`
+Hệ thống sẽ tự động quét "não" nó: *"À, làm tiếp việc hôm qua đang dở -> Nó sẽ tự điều hướng sang lệnh `/gsd-resume-work` hoặc `/gsd-quick` tương ứng"* mà bạn không cần phải lục lọi trí nhớ.
+
+### Cách 2: Câu Prompt "Triệu hồi trí nhớ" để hỏi AI (Copy & Paste)
+Nếu bạn không muốn hệ thống tự làm mà chỉ muốn tham khảo ý kiến AI trước, hãy copy đúng câu prompt này ném vào khung chat:
+
+> "Tôi đang dùng hệ thống get-shit-done (GSD). Hiện tại tôi đang muốn làm việc này: **[Mô tả yêu cầu của bạn]**. Bạn hãy đóng vai chuyên gia GSD, phân tích tình huống và gợi ý cho tôi đúng 1 lệnh `/gsd-...` phù hợp nhất lúc này cùng cách dùng của nó."
+
+Bạn chỉ cần lưu câu prompt trên (hoặc nhớ lệnh thần thánh `/gsd-do`), dù ở bất kì dự án hay bối cảnh nào, Antigravity và GSD cũng sẽ luôn đưa bạn về đúng quỹ đạo!
