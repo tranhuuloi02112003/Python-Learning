@@ -1,0 +1,7 @@
+2023-10-27 10:01:05 INFO User 'loc' logged in
+2023-10-27 10:02:45 ERROR Database connection failed
+2023-10-27 10:05:12 INFO Data uploaded successfully
+2023-10-27 10:10:30 WARNING Disk space low
+2023-10-27 10:15:00 ERROR Unauthorized access at /admin
+2023-10-27 10:20:00 INFO User 'admin' viewed dashboard
+2023-10-27 10:25:00 ERROR Timeout from API

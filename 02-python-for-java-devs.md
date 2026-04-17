@@ -250,7 +250,7 @@ print(list(user_info.values())) # Lấy tất cả giá trị: [101, 'Tom', 'adm
   > _(Liên tưởng: Bạn hay dùng nó như `HashSet`. Set dùng `{}` giống dict nhưng không có cấu trúc theo cặp Key:Value)._
 
 ```python
-unique_ids = {1, 2, 2, 3, 4, 4, 5}
+unique_ids = {1, 2, 2, 3, 4, 4, 5} # Khi khai báo k có dạng k,v thì dây là 1 set
 print(unique_ids) # Kết quả đã tự xoá trùng: {1, 2, 3, 4, 5}
 
 unique_ids.add(6)
@@ -262,6 +262,23 @@ set_B = {3, 4, 5}
 print(set_A.union(set_B))        # Hợp A và B
 print(set_A.intersection(set_B)) # Giao A và B (Những phần tử chung)
 ```
+
+### 5. Tại sao không dùng List cho tất cả? (Chiến lược chọn Data Structure)
+
+Đây là bảng tóm tắt giúp bạn ra quyết định nhanh khi thiết kế hệ thống:
+
+| Cấu trúc  | Khi nào nên dùng?                                                               | Lợi thế cốt lõi                                                                          |
+| :-------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
+| **List**  | Cần lưu dữ liệu có thứ tự, cho phép trùng (vd: danh sách bài post).             | Dễ dùng, phổ biến nhất.                                                                  |
+| **Tuple** | Dữ liệu là "hằng số", cấu hình (vd: tọa độ, cấu hình Server).                   | **An toàn:** Đảm bảo dữ liệu không bị sửa đổi ngoài ý muốn (Immutable).                  |
+| **Set**   | Lọc trùng hoặc kiểm tra tồn tại (vd: check email/username đã tồn tại chưa).     | **Tốc độ:** Tìm trong Set cực nhanh (O(1)), nhanh hơn nhiều so với List khi dữ liệu lớn. |
+| **Dict**  | Cần tra cứu thông tin theo từ khóa (vd: thông tin chi tiết của 1 User theo ID). | **Hiệu năng:** Không cần vòng lặp, truy xuất trực tiếp qua Key.                           |
+
+> **💡 Bí kíp chọn nhanh (Rules of Thumb):**
+> *   **Cần thứ tự, cho phép trùng:** Chọn **List**.
+> *   **Tra cứu nhanh bằng từ khóa:** Chọn **Dict**.
+> *   **Cần DUY NHẤT, không quan trọng thứ tự:** Chọn **Set**.
+> *   **Dữ liệu cố định, không được sửa (ReadOnly):** Chọn **Tuple**.
 
 ---
 
