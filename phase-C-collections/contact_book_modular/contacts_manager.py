@@ -38,6 +38,6 @@ def load_from_file():
             reader = csv.DictReader(file)
             for row in reader:
                 contacts.append(row)
-        print("Đã nạp dữ liệu từ file.")
+        print("Da nap du lieu tu file.")
     except FileNotFoundError:
-        print("Chưa có file dữ liệu, bắt đầu danh bạ mới.")
+        print("Chua co file du lieu, bat dau danh ba moi.")

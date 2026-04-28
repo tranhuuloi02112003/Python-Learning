@@ -20,12 +20,12 @@ def analyze_log():
             elif "WARNING" in line:
                 status_count["WARNING"] += 1
 
-    print(f"=== BÁO CÁO LOG (Tổng số dòng: {total_lines}) ===")
-    print(f"Số lỗi Error: {status_count['ERROR']}")
-    print(f"Số cảnh báo Warning: {status_count['WARNING']}")
-    print(f"Số thông tin Info: {status_count['INFO']}")
+    print(f"=== BAO CAO LOG (Tong so dong: {total_lines}) ===")
+    print(f"So loi Error: {status_count['ERROR']}")
+    print(f"So canh bao Warning: {status_count['WARNING']}")
+    print(f"So thong tin Info: {status_count['INFO']}")
     
-    print("\n--- CHI TIẾT CÁC DÒNG LỖI (ERROR) ---")
+    print("\n--- CHI TIET CAC DONG LOI (ERROR) ---")
     for err in error_lines:
         print(f"{err}")
 

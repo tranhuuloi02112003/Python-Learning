@@ -4,9 +4,9 @@ cleaned_emails = [email.strip().lower() for email in raw_emails]
 
 unique_emails = set(cleaned_emails)
 
-print(f"Danh sách sạch: {unique_emails}")
+print(f"Danh sach sach: {unique_emails}")
 
 
-# Trong Python, Tuple thường dùng để lưu các "Hệ số" hoặc "Cấu hình" mà bạn không muốn code của mình vô tình sửa đổi.
-# Ví dụ: Lưu tọa độ GPS hoặc các hằng số cấu hình App.
+# Trong Python, Tuple thuong dung de luu cac "He so" hoac "Cau hinh" ma ban khong muon code cua minh vo tinh sua doi.
+# Vi du: Luu toa do GPS hoac cac hang so cau hinh App.
 APP_CONFIG = ("Dark Mode", "Vietnam", "v1.0.2")

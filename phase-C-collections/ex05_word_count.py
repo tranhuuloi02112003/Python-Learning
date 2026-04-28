@@ -3,7 +3,7 @@ import utils
 def analyze_text(file_path):
     total_lines = 0
     total_chars = 0
-    word_count = {} # Dictionary để đếm từ
+    word_count = {} # Dictionary de dem tu
 
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -20,18 +20,18 @@ def analyze_text(file_path):
                     else:
                         word_count[word] = 1
 
-        utils.print_header("Báo Cáo Phân Tích")
-        print(f"Tổng số dòng: {total_lines}")
-        print(f"Tổng số ký tự: {total_chars}")
+        utils.print_header("Bao Cao Phan Tich")
+        print(f"Tong so dong: {total_lines}")
+        print(f"Tong so ky tu: {total_chars}")
 
-        print("Top 5 từ xuất hiện nhiều nhất:")
+        print("Top 5 tu xuat hien nhieu nhat:")
         sorted_word = sorted(word_count.items(), key = lambda word: word[1], reverse=True)
 
         for word, count in sorted_word[:5]:
-            print(f"- {word}: {count} lần")
+            print(f"- {word}: {count} lan")
             
     except FileNotFoundError:
-        print(f"Lỗi: Không thể tìm thấy file '{file_path}'. Vui lòng kiểm tra lại đường dẫn!")
+        print(f"Loi: Khong the tim thay file '{file_path}'. Vui long kiem tra lai duong dan!")
 
 
 analyze_text("phase-C-collections/sample_text.txt")

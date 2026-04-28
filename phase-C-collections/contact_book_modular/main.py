@@ -5,64 +5,64 @@ def main():
     
     while True:
         print("""
---- QUẢN LÝ DANH BẠ (Modular) ---
-1. Thêm liên hệ
-2. Sửa thông tin liên hệ
-3. Hiển thị danh bạ
-4. Tìm kiếm theo tên
-5. Xóa liên hệ
-6. Lưu danh bạ vào file
-7. Thoát
+--- QUAN LY DANH BA (Modular) ---
+1. Them lien he
+2. Sua thong tin lien he
+3. Hien thi danh ba
+4. Tim kiem theo ten
+5. Xoa lien he
+6. Luu danh ba vao file
+7. Thoat
         """)
         
-        choice = input("Lựa chọn của bạn: ")
+        choice = input("Lua chon cua ban: ")
         
         if choice == "1":
-            name = input("Nhập tên:")
-            phone = input("Nhập SDT:")
-            email = input("Nhập email:")
+            name = input("Nhap ten:")
+            phone = input("Nhap SDT:")
+            email = input("Nhap email:")
             manager.add_contact(name, phone, email)
-            print("Đã thêm thành công")
+            print("Da them thanh cong")
             
         elif choice == "2":
-            name = input("Nhập tên cần sửa:")
-            phone = input("Nhập SDT mới:")
-            email = input("Nhập email mới:")
+            name = input("Nhap ten can sua:")
+            phone = input("Nhap SDT moi:")
+            email = input("Nhap email moi:")
             if manager.update_contact(name, phone, email):
-                print("Đã cập nhật thành công")
+                print("Da cap nhat thanh cong")
             else:
-                print("Không tìm thấy liên hệ")
+                print("Khong tim thay lien he")
                 
         elif choice == "3":
-            print("DANH SÁCH DANH BẠ")
+            print("DANH SACH DANH BA")
             if not manager.contacts:
-                print("Danh bạ đang trống!")
+                print("Danh ba dang trong!")
             for p in manager.contacts:
-                print(f"Tên: {p['name']}, SDT: {p['phone']}, Email: {p['email']}")
+                print(f"Ten: {p['name']}, SDT: {p['phone']}, Email: {p['email']}")
                 
         elif choice == "4":
-            keyword = input("Nhập tên cần tìm:")
+            keyword = input("Nhap ten can tim:")
             results = manager.search_contacts(keyword)
             if results:
                 for r in results:
-                    print(f"Tên: {r['name']}, SDT: {r['phone']}, Email: {r['email']}")
+                    print(f"Ten: {r['name']}, SDT: {r['phone']}, Email: {r['email']}")
             else:
-                print("Không tìm thấy liên hệ nào")
+                print("Khong tim thay lien he nao")
                 
         elif choice == "5":
-            name = input("Nhập tên cần xóa:")
+            name = input("Nhap ten can xoa:")
             if manager.delete_contact(name):
-                print("Đã xóa thành công")
+                print("Da xoa thanh cong")
             else:
-                print("Không tìm thấy liên hệ nào")
+                print("Khong tim thay lien he nao")
 
         elif choice == "6":
             manager.save_to_file()
-            print("Đã lưu danh bạ vào file contacts.csv")
+            print("Da luu danh ba vao file contacts.csv")
 
         elif choice == "7":
             manager.save_to_file()
-            print("Thoát...")
+            print("Thoat...")
             break
 
 # Kiểm tra nếu file được chạy trực tiếp thì mới thực thi hàm main()
