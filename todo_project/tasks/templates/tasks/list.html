@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Todo List</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>✨ Quản Lý Công Việc</h1>
+
+      <!-- Form Thêm việc -->
+      <form
+        method="POST"
+        action="{% if task_to_edit %}{% url 'edit_task' task_to_edit.id %}{% else %}{% url 'home' %}{% endif %}"
+        class="form-group"
+      >
+        {% csrf_token %} {{ form.title }} {% if task_to_edit %}
+        <button type="submit" class="btn btn-edit">Cập nhật</button>
+
+        <a href="/" class="btn" style="background-color: #888">Hủy</a>
+        {% else %}
+        <button type="submit" class="btn btn-add">+ Thêm</button>
+        {% endif %}
+      </form>
+
+      <!-- Danh sách -->
+      <ul class="task-list">
+        {% for task in tasks %}
+        <li class="task-item">
+          <div class="task-info">
+            <!-- Tên công việc -->
+            {% if task.completed %}
+            <div class="task-title completed">{{ task.title }}</div>
+            {% else %}
+            <div class="task-title">{{ task.title }}</div>
+            {% endif %}
+
+            <!-- Thời gian tạo -->
+            <div class="task-date">
+              Tạo lúc: {{ task.created_at|date:"H:i - d/m/Y" }}
+            </div>
+          </div>
+
+          <!-- Nút bấm -->
+          <div class="actions">
+            <a href="?edit={{task.id}}" class="btn btn-edit">Sửa</a>
+            <!-- Đường dẫn động của Django -->
+            <a href="{% url 'delete_task' task.id %}" class="btn btn-delete"
+              >Xóa</a
+            >
+          </div>
+        </li>
+
+        {% empty %}
+        <!-- Nếu chưa có công việc nào thì in ra dòng này -->
+        <li class="task-item" style="justify-content: center; color: #888">
+          Chưa có công việc nào. Hãy thêm ngay!
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>

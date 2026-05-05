@@ -1,0 +1,119 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+.form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+}
+input[type="text"]:focus {
+  border-color: #3498db;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.btn-add {
+  background-color: #27ae60;
+}
+.btn-edit {
+  background-color: #f39c12;
+}
+.btn-delete {
+  background-color: #e74c3c;
+}
+.btn-cancel {
+  background-color: #95a5a6;
+}
+.actions .btn {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+input[type="text"] {
+  flex: 1;
+  height: 42px;
+  padding: 0 15px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+input[type="text"]:focus {
+  border-color: #3498db;
+}
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+.task-info {
+  flex: 1;
+}
+.task-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+.task-date {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+.completed {
+  text-decoration: line-through;
+  color: #aaa;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
