@@ -27,6 +27,42 @@
       </form>
 
       <!-- Danh sách -->
+
+      <!-- Thanh Lọc Trạng Thái -->
+      <div
+        class="filter-tabs"
+        style="
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-bottom: 25px;
+        "
+      >
+        <!-- Tab: Tất cả -->
+        <a
+          href="{% url 'home' %}"
+          class="filter-tab tab-all {% if not current_status %}active{% endif %}"
+        >
+          Tất cả
+        </a>
+
+        <!-- Tab: Chưa xong -->
+        <a
+          href="{% url 'home' %}?status=active"
+          class="filter-tab tab-active {% if current_status == 'active' %}active{% endif %}"
+        >
+          Chưa xong
+        </a>
+
+        <!-- Tab: Đã xong -->
+        <a
+          href="{% url 'home' %}?status=done"
+          class="filter-tab tab-done {% if current_status == 'done' %}active{% endif %}"
+        >
+          Đã xong
+        </a>
+      </div>
+
       <ul class="task-list">
         {% for task in tasks %}
         <li class="task-item">

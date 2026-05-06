@@ -141,6 +141,94 @@ my_dog.sleep()  # Output: Milu đang ngủ.
 my_dog.bark()   # Output: Milu sủa: Gâu gâu!
 ```
 
+### 3.1. Method Overriding – Ghi đè Phương thức (Chi tiết)
+
+Khi lớp con kế thừa từ lớp cha, đôi khi hành vi của phương thức trong lớp cha không còn phù hợp với lớp con nữa. **Method Overriding** cho phép lớp con **định nghĩa lại** phương thức đó với cùng tên.
+
+> **Quy tắc để ghi đè:** Chỉ cần định nghĩa lại hàm trong lớp con với **đúng tên** và **đúng signature**. Python sẽ tự biết ưu tiên dùng phiên bản của lớp con.
+
+**Có 3 chiến lược ghi đè:**
+
+#### Chiến lược 1: Viết mới hoàn toàn (Replace)
+Bỏ qua hoàn toàn logic của cha, viết logic mới từ đầu.
+
+```python
+class Employee:
+    def __init__(self, name, salary):
+        self.name = name
+        self.salary = salary
+
+    def get_info(self):
+        return f"NV: {self.name} - Lương: {self.salary}"
+
+class Developer(Employee):
+    def __init__(self, name, salary, language):
+        super().__init__(name, salary)  # Gọi cha để xử lý name, salary
+        self.language = language
+
+    # Ghi đè hoàn toàn - không dùng gì của cha nữa
+    def get_info(self):
+        return f"NV: {self.name} - Lương: {self.salary} - Ngôn ngữ: {self.language}"
+
+dev = Developer("An", 1000, "Python")
+print(dev.get_info())  # Output: NV: An - Lương: 1000 - Ngôn ngữ: Python
+```
+
+#### Chiến lược 2: Mở rộng (Extend) – Tận dụng lại lớp cha bằng `super()`
+Đây là cách viết **thông minh và chuyên nghiệp hơn**. Thay vì viết lại toàn bộ, ta dùng `super()` để lấy kết quả của cha rồi cộng thêm vào.
+
+```python
+class Developer(Employee):
+    def __init__(self, name, salary, language):
+        super().__init__(name, salary)
+        self.language = language
+
+    # Tận dụng kết quả của cha rồi mở rộng thêm
+    def get_info(self):
+        parent_info = super().get_info()        # Lấy chuỗi "NV: An - Lương: 1000"
+        return f"{parent_info} - Ngôn ngữ: {self.language}"  # Ghép thêm vào
+
+dev = Developer("An", 1000, "Python")
+print(dev.get_info())  # Output: NV: An - Lương: 1000 - Ngôn ngữ: Python
+```
+
+> **💡 Khi nào dùng `super()` trong Override?**
+> - Khi logic của cha vẫn còn giá trị và bạn chỉ muốn **bổ sung thêm**, hãy dùng `super()`.
+> - Khi logic của cha **hoàn toàn không phù hợp**, hãy viết mới hoàn toàn (Chiến lược 1).
+> - Trong `__init__`, **hầu như luôn luôn** phải gọi `super().__init__(...)` để đảm bảo các thuộc tính từ cha được khởi tạo đúng.
+
+#### Chiến lược 3: Kết hợp với vòng lặp đa hình (Polymorphism in action)
+Đây là ứng dụng thực tế nhất: nhiều lớp con có cùng tên hàm nhưng hành vi khác nhau, và ta có thể gọi chúng theo cách thống nhất.
+
+```python
+class Manager(Employee):
+    def __init__(self, name, salary, team_size):
+        super().__init__(name, salary)
+        self.team_size = team_size
+
+    def get_info(self):
+        parent_info = super().get_info()
+        return f"{parent_info} - Quản lý: {self.team_size} người"
+
+# Danh sách nhân viên các loại khác nhau
+employees = [
+    Employee("Bình", 800),
+    Developer("An", 1000, "Python"),
+    Manager("Chi", 2000, 5),
+]
+
+# Gọi chung một lệnh, mỗi đối tượng tự biết phản hồi theo cách của mình
+for emp in employees:
+    print(emp.get_info())
+
+# Output:
+# NV: Bình - Lương: 800
+# NV: An - Lương: 1000 - Ngôn ngữ: Python
+# NV: Chi - Lương: 2000 - Quản lý: 5 người
+```
+
+---
+
 ## 4. Tính Đa hình (Polymorphism)
 
 Đa hình là "một giao diện, nhiều cách thực hiện". Nó cho phép các đối tượng thuộc các lớp khác nhau có thể phản hồi lại cùng một lời gọi phương thức theo cách riêng của chúng.

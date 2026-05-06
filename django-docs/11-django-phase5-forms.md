@@ -93,9 +93,19 @@ Khi người dùng nhập "abc" vào, `is_valid()` sẽ tự động gọi hàm 
 
 ---
 
-## 4. Tại sao PHẢI có `{% csrf_token %}` trong mọi Form?
+## 4. Giải mã cơ chế bảo mật CSRF
 
-Đây là cơ chế bảo mật chống lại cuộc tấn công **CSRF (Cross-Site Request Forgery - Mạo danh yêu cầu)**.
+**CSRF** là viết tắt của **Cross-Site Request Forgery**. Để hiểu nó là gì, hãy bóc tách từng từ:
+
+| Từ khóa | Ý nghĩa trong bảo mật | Giải thích dễ hiểu |
+| :--- | :--- | :--- |
+| **Cross-Site** | Xuyên trang / Liên trang | Cuộc tấn công **bắt đầu từ một trang web khác** (ví dụ: trang web độc hại của hacker) nhưng mục tiêu nhắm tới là trang web của bạn (ví dụ: Facebook, Ngân hàng). |
+| **Request** | Yêu cầu (HTTP Request) | Hacker gửi một yêu cầu (thường là lệnh thay đổi dữ liệu như `POST`) tới máy chủ trang web mục tiêu. |
+| **Forgery** | Sự giả mạo / Sự làm giả | Đây là một **yêu cầu giả mạo** vì nó không phải do chính tay bạn thực hiện, nhưng nó lại mang theo "chữ ký" hợp lệ của bạn (Cookie) nên máy chủ bị lừa. |
+
+👉 **Tóm lại:** CSRF là loại tấn công **"Mượn tay trình duyệt để làm giả yêu cầu"**. Hacker không cần biết mật khẩu của bạn, nó chỉ cần lừa trình duyệt của bạn gửi một yêu cầu đi kèm với Cookie đăng nhập mà bạn đang có sẵn.
+
+---
 
 #### A. Kịch bản tấn công (Nếu không có Token)
 1.  **Dấu vân tay (Cookie):** Khi bạn đăng nhập vào Facebook, trình duyệt lưu một cái Cookie (như dấu vân tay của bạn). Mỗi khi bạn làm gì trên Facebook, trình duyệt tự động đính kèm "dấu vân tay" này để Facebook biết đó là bạn.
@@ -103,10 +113,18 @@ Khi người dùng nhập "abc" vào, `is_valid()` sẽ tự động gọi hàm 
 3.  **Lỗ hổng:** Trình duyệt thấy yêu cầu gửi tới Facebook, nó **tự động** đính kèm dấu vân tay của bạn vào. Facebook thấy dấu vân tay đúng, thế là xóa tài khoản của bạn mà bạn không hề hay biết.
 
 #### B. Giải pháp: Mã bí mật (`{% csrf_token %}`)
-Django không chỉ tin vào mỗi "Dấu vân tay" (Cookie). Khi bạn mở một cái Form, Django nhét thêm một cái **Mã bí mật** ngẫu nhiên vào Form đó.
+Django không chỉ tin vào mỗi "Dấu vân tay" (Cookie). Khi bạn mở một trang web có Form, Django sẽ thực hiện:
+1.  **Sinh mã:** Tạo ra một chuỗi ký tự ngẫu nhiên, duy nhất cho phiên làm việc đó (Session).
+2.  **Gửi đi:** Gửi mã này về trình duyệt và lưu ở 2 nơi: Một bản nằm trong **Cookie** của bạn, và một bản nằm ẩn trong thẻ `<input type="hidden">` của cái Form nhờ lệnh `{% csrf_token %}`.
 
-1.  **Xác thực kép:** Để thực hiện một yêu cầu (như Thêm/Xóa Task), Django bắt buộc bạn phải nộp đủ: **Dấu vân tay (Cookie)** + **Mã bí mật (Token)**.
-2.  **Tính bảo mật:** Trang web của Hacker có thể lừa trình duyệt gửi "Dấu vân tay", nhưng nó **không cách nào lấy trộm được "Mã bí mật"** nằm bên trong trang web của bạn (do luật bảo mật của trình duyệt).
-3.  **Kết quả:** Khi request từ trang Hacker gửi tới mà thiếu Mã bí mật, Django sẽ chặn đứng và báo lỗi `403 Forbidden`.
+#### C. Cơ chế xác thực kỹ thuật (Workflow)
+Khi bạn bấm Submit, Django Middleware sẽ đứng ở cửa chặn lại và kiểm tra:
+- **Bước 1:** So sánh cái mã gửi lên từ **Form** và cái mã đang nằm trong **Cookie**.
+- **Bước 2:** Nếu 2 mã **KHỚP NHAU** → Django tin đây là yêu cầu chính chủ từ trang web của mình → Cho phép vào View xử lý.
+- **Bước 3:** Nếu mã **THIẾU** hoặc **KHÔNG KHỚP** (do Hacker không thể đọc được Cookie của bạn để lấy mã) → Django lập tức trả về lỗi **403 Forbidden**.
+
+#### D. Tại sao GET không cần, mà POST lại bắt buộc?
+- **GET (An toàn):** Theo quy chuẩn, các yêu cầu GET chỉ dùng để "Xem/Đọc" dữ liệu, không làm thay đổi trạng thái hệ thống. Hacker có mạo danh bạn GET trang cá nhân thì cũng chỉ mình nó xem (trên máy nó), không gây hại cho dữ liệu của bạn.
+- **POST (Nguy hiểm):** Dùng để "Thêm/Sửa/Xóa" dữ liệu. Nếu Hacker mạo danh thành công, nó có thể xóa sạch Task, đổi mật khẩu hoặc chuyển tiền của bạn. Vì thế, Django bắt buộc mọi yêu cầu làm thay đổi dữ liệu (POST, PUT, DELETE) phải có Token bảo vệ.
 
 👉 **Tóm lại:** `{% csrf_token %}` là lá chắn đảm bảo rằng yêu cầu này được gửi đi từ **chính trang web của bạn**, chứ không phải bị một trang web khác mạo danh gửi hộ.

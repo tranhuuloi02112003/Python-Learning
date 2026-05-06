@@ -15,12 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from tasks import views
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home_page, name='home'), 
-    path('delete/<int:pk>/', views.delete_task, name="delete_task"),
-    path('edit/<int:pk>/', views.edit_task, name="edit_task"),
+    # Chuyển mọi request trang chủ tới file urls của app tasks
+    path('', include('tasks.urls')),
 ]

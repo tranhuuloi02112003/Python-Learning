@@ -1,5 +1,17 @@
 # Django Runserver & Common Commands
 
+## 0. Giải ngố `python` vs `python3` & `manage.py`
+
+### `python` hay `python3`?
+- **Bản chất:** Trên Mac/Linux hiện đại, lệnh `python3` là gọi đích danh Python phiên bản 3.
+- **Phép thuật của `venv`:** Một khi bạn đã kích hoạt môi trường ảo (hiện chữ `(.venv)` ở đầu terminal), hệ thống đã ngầm tự động trỏ lệnh `python` về đúng `python3`. Vậy nên, khi ở trong `venv`, bạn cứ gõ `python` cho ngắn gọn nhé!
+
+### File `manage.py` là gì?
+Hãy coi `manage.py` nằm ở thư mục ngoài cùng của bạn như một cái **Điều khiển từ xa (Remote Control)** của dự án. Bản thân nó không làm gì cả, nó chỉ chờ bạn bấm nút lệnh từ Terminal.
+- **Công thức chuẩn:** `[Gọi ngôn ngữ Python] chạy file [Điều khiển manage.py] với [Tên lệnh]`
+
+---
+
 ## 1. Lệnh `runserver` là gì?
 
 Lệnh `python manage.py runserver [port]` được dùng để khởi chạy **Development Server**. Đây là một web server nhẹ, tích hợp sẵn giúp lập trình viên kiểm tra code nhanh chóng.
