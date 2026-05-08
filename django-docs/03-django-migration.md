@@ -16,28 +16,7 @@ Lệnh này có bản chất là **đồng bộ hóa các Model trong code vào 
 
 ---
 
-## 2. Tại sao hay thấy nó đi chung với Docker?
 
-Khi đóng gói ứng dụng Backend vào Docker, lệnh này thường được viết trong `docker-compose.yml` hoặc `Dockerfile` (phần `entrypoint` hoặc `cmd`) để **tự động hóa** quá trình triển khai.
-
-**Mục tiêu:** Mỗi khi Container khởi chạy, Database sẽ tự động được cập nhật lên phiên bản mới nhất mà không cần thao tác thủ công.
-
-> **Lưu ý:** Bạn hoàn toàn có thể chạy lệnh này trên máy local (không cần Docker) nếu đã cài Python và Django.
-
-### Ví dụ cấu hình trong `docker-compose.yml`
-
-```yaml
-services:
-  web:
-    build: .
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    depends_on:
-      - db
-  db:
-    image: postgres:15
-```
-
----
 
 ## 3. Quy trình Migration trong Django (Khác với Java)
 

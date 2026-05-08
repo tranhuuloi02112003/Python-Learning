@@ -81,6 +81,8 @@ input[type="text"] {
   font-size: 15px;
   outline: none;
   transition: border-color 0.3s;
+  width: 100%; /* Bắt buộc chiếm 100% chiều rộng của div cha */
+  box-sizing: border-box;
 }
 input[type="text"]:focus {
   border-color: #3498db;
@@ -143,4 +145,13 @@ input[type="text"]:focus {
   background-color: #27ae60;
   color: white;
   box-shadow: 0 4px 6px rgba(39, 174, 96, 0.3);
+}
+
+/* Nút Đánh dấu hoàn thành (Màu xanh dương nổi bật để gọi mời bấm) */
+.btn-toggle-active {
+  background-color: #3498db;
+}
+/* Nút Hoàn tác (Màu xám chìm đi vì việc đã làm xong rồi) */
+.btn-toggle-done {
+  background-color: #95a5a6;
 }

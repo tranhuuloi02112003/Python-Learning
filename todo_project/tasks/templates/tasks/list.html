@@ -14,10 +14,19 @@
       <!-- Form Thêm việc -->
       <form
         method="POST"
+        novalidate
         action="{% if task_to_edit %}{% url 'edit_task' task_to_edit.id %}{% else %}{% url 'home' %}{% endif %}"
         class="form-group"
       >
-        {% csrf_token %} {{ form.title }} {% if task_to_edit %}
+        {% csrf_token %}
+        <div style="flex: 1">
+          {{ form.title }}
+          <!-- Dòng này là "loa phát thanh" hiện lỗi đỏ chót -->
+          <div style="color: red; font-size: 13px; margin-top: 5px">
+            {{ form.title.errors }}
+          </div>
+        </div>
+        {% if task_to_edit %}
         <button type="submit" class="btn btn-edit">Cập nhật</button>
 
         <a href="/" class="btn" style="background-color: #888">Hủy</a>
@@ -25,8 +34,6 @@
         <button type="submit" class="btn btn-add">+ Thêm</button>
         {% endif %}
       </form>
-
-      <!-- Danh sách -->
 
       <!-- Thanh Lọc Trạng Thái -->
       <div
@@ -63,16 +70,15 @@
         </a>
       </div>
 
+      <!-- Danh sách -->
       <ul class="task-list">
         {% for task in tasks %}
         <li class="task-item">
           <div class="task-info">
             <!-- Tên công việc -->
-            {% if task.completed %}
-            <div class="task-title completed">{{ task.title }}</div>
-            {% else %}
-            <div class="task-title">{{ task.title }}</div>
-            {% endif %}
+            <div class="task-title {% if task.completed %}completed{% endif %}">
+              {{ task.title }}
+            </div>
 
             <!-- Thời gian tạo -->
             <div class="task-date">
@@ -82,6 +88,18 @@
 
           <!-- Nút bấm -->
           <div class="actions">
+            <form action="{% url 'toggle_task' task.id %}" method="POST">
+              {% csrf_token %} {% if task.completed %}
+              <button type="submit" class="btn btn-toggle-done">
+                Hoàn tác
+              </button>
+              {% else %}
+              <button type="submit" class="btn btn-toggle-active">
+                Xong ✓
+              </button>
+              {% endif %}
+            </form>
+
             <a href="?edit={{task.id}}" class="btn btn-edit">Sửa</a>
             <!-- Đường dẫn động của Django -->
             <a href="{% url 'delete_task' task.id %}" class="btn btn-delete"

@@ -1,14 +1,24 @@
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from .models import Task
+from .models import Task, Project
 from .forms import TaskForm
 
 # Create your views here.
 def home_page(request):
     # Hiển thị theo thứ tự từ mới nhất
     tasks = Task.objects.all().order_by('-created_at')
+    projects = Project.objects.all()
 
+    # --------- LOGIC LỌC THEO PROJECT ---------
+    project_id = request.GET.get('project')
+    selected_project_id = None
+    
+    if project_id:
+        tasks = tasks.filter(project_id=project_id)
+        selected_project_id = int(project_id)
+
+    # --------- LOGIC LỌC THEO STATUS ---------
     status_filter = request.GET.get('status')
 
     if status_filter == 'done':
@@ -43,8 +53,10 @@ def home_page(request):
             return redirect('home')  # Xong thì tải lại trang chủ ('/')
     
     # Render ra trang HTML với data
-    return render(request, 'tasks/list.html', {
+    return render(request, 'tasks/base_pro.html', {
         'tasks': tasks, 
+        'projects': projects,
+        'selected_project_id': selected_project_id,
         'form': form, 
         'task_to_edit': task_to_edit,
         'current_status': status_filter
@@ -69,3 +81,21 @@ def edit_task(req, pk):
 
     # Nếu vô tình truy cập bằng đường link (GET request) thì đá về trang chủ chế độ sửa
     return redirect(f"/?edit={task.id}")
+
+def create_project(req):
+    if req.method == "POST":
+        project_name = req.POST.get('name')
+        color_theme = req.POST.get('color_theme')
+
+        Project.objects.create(
+            name = project_name,
+            color_theme = color_theme
+        )
+    return redirect('home')
+    
+def toggle_task(req, pk):
+    if req.method == "POST":
+        task = get_object_or_404(Task, id=pk)
+        task.completed = not task.completed
+        task.save()
+    return redirect('home')

@@ -26,6 +26,17 @@ print("Dòng này chạy độc lập")
 
 Python là ngôn ngữ kiểu động (không cần khai báo kiểu của biến lúc khởi tạo) nhưng lại mạnh về kiểu (Strongly Typed - không tự động ép kiểu lung tung để tránh lỗi ngầm).
 
+### 2.1. Mutable vs Immutable (Tính thay đổi)
+
+Đây là khái niệm cực kỳ quan trọng để tránh bug khi xử lý dữ liệu:
+
+- **Immutable (Không thể thay đổi):** Một khi đã tạo ra, giá trị của nó trong bộ nhớ không bao giờ bị sửa đổi. Nếu bạn "thay đổi", Python thực chất sẽ tạo ra một đối tượng mới hoàn toàn.
+  - **Các kiểu dữ liệu:** `int`, `float`, `complex`, `str`, `bool`, `tuple`, `None`, `frozenset`, `bytes`.
+- **Mutable (Có thể thay đổi):** Bạn có thể sửa đổi nội dung của đối tượng đó mà không làm thay đổi địa chỉ bộ nhớ của nó.
+  - **Các kiểu dữ liệu:** `list`, `dict`, `set`, `bytearray`.
+
+> **Ví dụ:** Khi bạn cộng chuỗi `s = "a" + "b"`, Python không sửa chữ "a" thành "ab", mà nó tạo ra một vùng nhớ mới chứa "ab" và gán lại cho biến `s`.
+
 > _(Mở rộng: Trong Java bạn phải khai báo `String name = "Gemini"`, còn Python biến sẽ tự nhận kiểu từ giá trị gắn cho nó. Tuy nhiên, Python sẽ báo lỗi nếu bạn cố tình cộng chuỗi với số mà không ép kiểu rõ ràng)._
 
 ```python
@@ -263,22 +274,23 @@ print(set_A.union(set_B))        # Hợp A và B
 print(set_A.intersection(set_B)) # Giao A và B (Những phần tử chung)
 ```
 
-### 5. Tại sao không dùng List cho tất cả? (Chiến lược chọn Data Structure)
+### 5. So sánh
 
-Đây là bảng tóm tắt giúp bạn ra quyết định nhanh khi thiết kế hệ thống:
+| Cấu trúc  | Cú pháp  | Thứ tự |  Trùng lặp   |   Tính chất   | Lợi thế cốt lõi                                          |
+| :-------- | :------- | :----: | :----------: | :-----------: | :------------------------------------------------------- |
+| **List**  | `[a, b]` |   Có   |      Có      |  **Mutable**  | Linh hoạt, dùng phổ biến nhất cho danh sách đồ vật.      |
+| **Tuple** | `(a, b)` |   Có   |      Có      | **Immutable** | An toàn, bảo vệ dữ liệu không bị sửa (tọa độ, cấu hình). |
+| **Set**   | `{a, b}` | Không  |    Không     |  **Mutable**  | Tốc độ tìm kiếm cực nhanh, dùng để lọc trùng.            |
+| **Dict**  | `{k: v}` |  Có\*  | Key duy nhất |  **Mutable**  | Tra cứu thông tin theo từ khóa (như JSON/HashMap).       |
 
-| Cấu trúc  | Khi nào nên dùng?                                                               | Lợi thế cốt lõi                                                                          |
-| :-------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
-| **List**  | Cần lưu dữ liệu có thứ tự, cho phép trùng (vd: danh sách bài post).             | Dễ dùng, phổ biến nhất.                                                                  |
-| **Tuple** | Dữ liệu là "hằng số", cấu hình (vd: tọa độ, cấu hình Server).                   | **An toàn:** Đảm bảo dữ liệu không bị sửa đổi ngoài ý muốn (Immutable).                  |
-| **Set**   | Lọc trùng hoặc kiểm tra tồn tại (vd: check email/username đã tồn tại chưa).     | **Tốc độ:** Tìm trong Set cực nhanh (O(1)), nhanh hơn nhiều so với List khi dữ liệu lớn. |
-| **Dict**  | Cần tra cứu thông tin theo từ khóa (vd: thông tin chi tiết của 1 User theo ID). | **Hiệu năng:** Không cần vòng lặp, truy xuất trực tiếp qua Key.                           |
+_\*Ghi chú: Từ Python 3.7+, Dict giữ thứ tự chèn phần tử._
 
 > **💡 Bí kíp chọn nhanh (Rules of Thumb):**
-> *   **Cần thứ tự, cho phép trùng:** Chọn **List**.
-> *   **Tra cứu nhanh bằng từ khóa:** Chọn **Dict**.
-> *   **Cần DUY NHẤT, không quan trọng thứ tự:** Chọn **Set**.
-> *   **Dữ liệu cố định, không được sửa (ReadOnly):** Chọn **Tuple**.
+>
+> - **Cần thứ tự, cho phép trùng:** Chọn **List**.
+> - **Tra cứu nhanh bằng từ khóa:** Chọn **Dict**.
+> - **Cần DUY NHẤT, không quan trọng thứ tự:** Chọn **Set**.
+> - **Dữ liệu cố định, không được sửa (ReadOnly):** Chọn **Tuple**.
 
 ---
 
