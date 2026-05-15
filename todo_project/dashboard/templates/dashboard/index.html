@@ -1,0 +1,81 @@
+{% extends "base_pro.html" %}
+
+{% block title %}Dashboard - TaskLog PRO{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex items-end justify-between gap-6">
+    <div>
+      <h1 class="font-display text-3xl font-extrabold text-[#191c1e]">Dashboard</h1>
+      <p class="mt-2 text-sm text-[#3d4a42]">A focused overview of your tasks, deadlines, and project progress.</p>
+    </div>
+  </div>
+
+  <section class="mb-6 grid grid-cols-5 gap-4">
+    {% include "dashboard/components/stat_card.html" with label="Total Tasks" value=total_tasks icon="list-checks" %}
+    {% include "dashboard/components/stat_card.html" with label="Due Today" value=today_tasks icon="calendar-days" %}
+    {% include "dashboard/components/stat_card.html" with label="Overdue" value=overdue_tasks icon="triangle-alert" tone="danger" %}
+    {% include "dashboard/components/stat_card.html" with label="In Progress" value=in_progress_tasks icon="loader-circle" %}
+    {% include "dashboard/components/stat_card.html" with label="Completed" value=completed_this_week icon="circle-check" tone="success" meta="this week" %}
+  </section>
+
+  <div class="grid grid-cols-[1fr_420px] gap-6">
+    <div class="space-y-6">
+      <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-200/70 px-5 py-4">
+          <div class="flex items-center gap-2">
+            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-[#059669]"><i data-lucide="calendar-days" class="h-4 w-4"></i></span>
+            <h2 class="font-display text-xl font-bold">Today's Tasks</h2>
+          </div>
+          <a href="{% url 'tasks:today' %}" class="text-sm font-semibold text-[#006948]">View all</a>
+        </div>
+        <div class="divide-y divide-slate-200/70">
+          {% for task in today_tasks_list %}
+            <div class="px-5 py-4">
+              {% include "tasks/components/task_card.html" with task=task grouped=True %}
+            </div>
+          {% empty %}
+            <div class="px-5 py-10 text-center text-sm text-[#3d4a42]">No tasks due today.</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="rounded-xl border border-red-200 bg-red-50/40 shadow-sm">
+        <div class="flex items-center justify-between border-b border-red-200 px-5 py-4">
+          <div class="flex items-center gap-2">
+            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100 text-[#ba1a1a]"><i data-lucide="triangle-alert" class="h-4 w-4"></i></span>
+            <h2 class="font-display text-xl font-bold text-[#ba1a1a]">Overdue</h2>
+          </div>
+          <a href="{% url 'tasks:overdue' %}" class="text-sm font-semibold text-[#ba1a1a] hover:underline">View all</a>
+        </div>
+        <div class="divide-y divide-red-200">
+          {% for task in overdue_tasks_list %}
+            <div class="px-5 py-4">
+              {% include "tasks/components/task_card.html" with task=task grouped=True %}
+            </div>
+          {% empty %}
+            <div class="px-5 py-10 text-center text-sm text-[#3d4a42]">No overdue tasks.</div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <aside class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="font-display text-xl font-bold">Project Progress</h2>
+      </div>
+      <div class="space-y-4">
+        {% for project in project_progress %}
+          <a href="{% url 'projects:detail' project.id %}" class="block rounded-lg border border-slate-100 p-3 hover:bg-[#f7f9fb]">
+            <div class="mb-2 flex items-center justify-between text-sm">
+              <span class="flex items-center gap-2 font-semibold"><span class="h-2.5 w-2.5 rounded-full {{ project.color_dot_class }}"></span>{{ project.name }}</span>
+              <span class="text-[#3d4a42]">{{ project.progress_percent }}%</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full {{ project.color_dot_class }}" style="width: {{ project.progress_percent }}%"></div></div>
+          </a>
+        {% empty %}
+          <div class="rounded-lg border border-dashed border-[#bccac0] p-6 text-center text-sm text-[#3d4a42]">No projects yet.</div>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+{% endblock %}

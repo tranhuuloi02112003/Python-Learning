@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
+    'projects',
+    'dashboard',
     'tasks',
 ]
 
@@ -57,7 +60,9 @@ ROOT_URLCONF = 'my_todo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # Root templates dùng cho layout/component chung của project.
+        'DIRS': [BASE_DIR / 'templates'],
+        # Cho phép Django tìm templates bên trong từng app.
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Bơm data dùng chung cho app shell: sidebar projects, task/project forms.
+                'core.context_processors.app_shell',
             ],
         },
     },
@@ -129,10 +136,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "tasks" / "static",
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

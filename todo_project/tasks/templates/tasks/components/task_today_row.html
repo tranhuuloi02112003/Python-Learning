@@ -1,0 +1,31 @@
+<article class="rounded-2xl border border-[#bccac0]/70 bg-white px-6 py-5 shadow-sm">
+  <div class="flex items-start gap-4">
+    {% include "tasks/components/task_toggle_button.html" with task=task form_class="pt-1" %}
+    <div class="min-w-0 flex-1">
+      <div class="flex items-start gap-3">
+        <div class="min-w-0 flex-1">
+          <a href="{% url 'tasks:detail' task.id %}" class="block truncate text-2xl font-semibold text-[#191c1e] hover:text-[#006948]">
+            {{ task.title }}
+          </a>
+          {% if task.description %}
+            <p class="mt-3 truncate text-base leading-7 text-[#3d4a42]">{{ task.description }}</p>
+          {% endif %}
+        </div>
+        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] {{ task.priority_badge_class }}">
+          {{ task.get_priority_display }}
+        </span>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-base text-[#3d4a42]/90">
+        <span class="inline-flex items-center gap-2 {% if task.priority == 'urgent' or task.due_state == 'overdue' %}text-[#ba1a1a]{% endif %}">
+          <i data-lucide="{% if task.due_date %}clock-3{% else %}calendar{% endif %}" class="h-4 w-4"></i>
+          {% if task.due_date %}Due {{ task.due_date|date:"M d" }}{% else %}No due date{% endif %}
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <i data-lucide="folder" class="h-4 w-4"></i>
+          {% if task.project %}{{ task.project.name }}{% else %}Inbox{% endif %}
+        </span>
+      </div>
+    </div>
+    {% include "tasks/components/task_action_menu.html" with task=task button_class="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#3d4a42] hover:bg-[#f7f9fb]" %}
+  </div>
+</article>

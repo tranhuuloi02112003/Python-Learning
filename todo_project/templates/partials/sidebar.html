@@ -1,0 +1,62 @@
+<aside class="fixed inset-y-0 left-0 flex w-[260px] flex-col border-r border-[#bccac0]/70 bg-white px-5 py-6">
+  <a href="{% url 'dashboard:index' %}" class="mb-8 flex items-center gap-3">
+    <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#059669] text-white">
+      <i data-lucide="check-check" class="h-5 w-5"></i>
+    </span>
+    <span class="font-display text-xl font-extrabold text-[#191c1e]">TaskLog PRO</span>
+  </a>
+
+  <button type="button" onclick="document.getElementById('projectCreateModal').showModal()" class="mb-7 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white hover:bg-[#006948]">
+    <i data-lucide="plus" class="h-4 w-4"></i> New Project
+  </button>
+
+  <nav class="flex-1 space-y-7 text-sm">
+    <section>
+      <p class="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-[#3d4a42]/70">Main</p>
+      <div class="space-y-1">
+        <a href="{% url 'dashboard:index' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'dashboard' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+        </a>
+        <a href="{% url 'tasks:all' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'all' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="list-checks" class="h-4 w-4"></i> All Tasks
+        </a>
+        <a href="{% url 'tasks:inbox' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'inbox' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="inbox" class="h-4 w-4"></i> Inbox
+        </a>
+        <a href="{% url 'tasks:today' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'today' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="calendar-days" class="h-4 w-4"></i> Today
+        </a>
+        <a href="{% url 'tasks:upcoming' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'upcoming' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="calendar-clock" class="h-4 w-4"></i> Upcoming
+        </a>
+        <a href="{% url 'tasks:overdue' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'overdue' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="triangle-alert" class="h-4 w-4"></i> Overdue
+        </a>
+        <a href="{% url 'tasks:completed' %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'completed' %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+          <i data-lucide="circle-check" class="h-4 w-4"></i> Completed
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="mb-2 px-3">
+        <p class="text-[11px] font-bold uppercase tracking-wider text-[#3d4a42]/70">Projects</p>
+      </div>
+      <div class="space-y-1">
+        {% for project in sidebar_projects %}
+          <a href="{% url 'projects:detail' project.id %}" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition {% if active_nav == 'project' and project.id == object.id %}bg-emerald-50 text-[#006948]{% else %}text-[#3d4a42] hover:bg-[#f7f9fb]{% endif %}">
+            <span class="h-2.5 w-2.5 rounded-full {{ project.color_dot_class }}"></span>
+            <span class="truncate">{{ project.name }}</span>
+          </a>
+        {% empty %}
+          <p class="px-3 py-2 text-xs text-[#3d4a42]/70">No active projects yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </nav>
+
+  <div class="space-y-1 border-t border-[#bccac0]/70 pt-4 text-sm">
+    <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-[#3d4a42] hover:bg-[#f7f9fb]"><i data-lucide="settings" class="h-4 w-4"></i> Settings</a>
+    <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-[#3d4a42] hover:bg-[#f7f9fb]"><i data-lucide="circle-help" class="h-4 w-4"></i> Help</a>
+  </div>
+</aside>

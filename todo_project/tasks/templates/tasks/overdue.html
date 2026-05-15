@@ -1,0 +1,42 @@
+{% extends "base_pro.html" %}
+
+{% block title %}{{ page_title }} - TaskLog PRO{% endblock %}
+
+{% block content %}
+  <section>
+    <div class="flex items-end justify-between gap-6">
+      <div>
+        <h1 class="font-display text-4xl font-extrabold tracking-tight text-[#191c1e]">{{ page_title }}</h1>
+        <p class="mt-3 max-w-2xl text-lg text-[#3d4a42]">{{ page_description }}</p>
+      </div>
+      <form method="get" class="flex items-center gap-3">
+        {% if current_filters.q %}<input type="hidden" name="q" value="{{ current_filters.q }}" />{% endif %}
+        <select name="sort" onchange="this.form.submit()" class="h-11 rounded-xl border border-[#bccac0] bg-white px-4 text-sm text-[#3d4a42] outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20">
+          <option value="due_date" {% if current_filters.sort == "due_date" or not current_filters.sort %}selected{% endif %}>Most overdue</option>
+          <option value="priority" {% if current_filters.sort == "priority" %}selected{% endif %}>Highest priority</option>
+          <option value="oldest" {% if current_filters.sort == "oldest" %}selected{% endif %}>Oldest created</option>
+        </select>
+      </form>
+    </div>
+
+    <div class="mt-8 rounded-2xl border border-red-200 bg-red-50/70 p-6 text-[#7a2430] shadow-sm">
+      <div class="flex items-start justify-between gap-6">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-[#7a2430]/80">Attention Queue</p>
+          <h2 class="mt-2 text-2xl font-semibold text-[#6e202b]">{{ tasks|length }} task{{ tasks|length|pluralize }} need recovery</h2>
+        </div>
+        <p class="max-w-xl text-sm leading-6 text-[#8d3844]">
+          Overdue is an exception view, so the row design emphasizes lateness and urgency before anything else.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-8 space-y-4">
+      {% for task in tasks %}
+        {% include "tasks/components/task_list_row.html" with task=task show_project=True show_priority=True show_status=True overdue_note=True %}
+      {% empty %}
+        {% include "tasks/components/task_empty_state.html" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

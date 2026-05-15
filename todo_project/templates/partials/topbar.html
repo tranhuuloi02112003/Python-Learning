@@ -1,0 +1,15 @@
+<header class="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#bccac0]/70 bg-[#f7f9fb]/95 px-10 backdrop-blur">
+  {% url 'tasks:all' as default_tasks_url %}
+  <form action="{{ topbar_search_action|default_if_none:''|default:default_tasks_url }}" method="get" class="relative w-full max-w-xl">
+    <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#3d4a42]/60"></i>
+    <input name="q" value="{{ request.GET.q }}" type="search" placeholder="{{ topbar_search_placeholder|default:'Search tasks...' }}" class="h-10 w-full rounded-lg border border-[#bccac0] bg-white pl-10 pr-4 text-sm outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20" />
+  </form>
+  <div class="ml-6 flex items-center gap-3">
+    <button type="button" onclick="document.getElementById('taskCreateModal').showModal()" class="inline-flex h-10 items-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white hover:bg-[#006948]">
+      <i data-lucide="plus" class="h-4 w-4"></i> New Task
+    </button>
+    <div class="flex h-10 w-10 items-center justify-center rounded-full border border-[#bccac0] bg-white text-[#3d4a42]">
+      <i data-lucide="user" class="h-4 w-4"></i>
+    </div>
+  </div>
+</header>

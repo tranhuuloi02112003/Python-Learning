@@ -1,0 +1,97 @@
+{% if grouped %}
+<article class="bg-transparent">
+{% else %}
+<article class="rounded-xl border border-[#bccac0]/70 bg-white px-5 py-4 shadow-sm">
+{% endif %}
+    <div class="flex items-start gap-4">
+      <form
+        method="post"
+        action="{% url 'tasks:toggle' task.id %}"
+        class="pt-1"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+        <button
+          type="submit"
+          class="flex h-6 w-6 items-center justify-center rounded-md border border-[#bccac0] bg-white text-white transition hover:border-[#059669]"
+          aria-label="{% if task.is_done %}Restore task{% else %}Mark task done{% endif %}"
+        >
+          {% if task.is_done %}
+          <span
+            class="flex h-6 w-6 items-center justify-center rounded-md bg-[#059669]"
+            ><i data-lucide="check" class="h-4 w-4"></i
+          ></span>
+          {% endif %}
+        </button>
+      </form>
+
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <a
+            href="{% url 'tasks:detail' task.id %}"
+            class="truncate text-base font-semibold text-[#191c1e] hover:text-[#006948] {% if task.is_done %}line-through text-slate-400{% endif %}"
+            >{{ task.title }}</a
+          >
+          <span
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold {{ task.status_badge_class }}"
+            >{{ task.get_status_display }}</span
+          >
+          <span
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold {{ task.priority_badge_class }}"
+            >{{ task.get_priority_display }}</span
+          >
+        </div>
+
+        <div
+          class="mt-2 flex flex-wrap items-center gap-4 text-xs text-[#3d4a42]/80"
+        >
+          <span class="inline-flex items-center gap-1"
+            ><i data-lucide="folder" class="h-3.5 w-3.5"></i>
+            {% if task.project %}{{ task.project.name }}{% else %}Inbox{% endif %}
+          </span>
+          <span class="inline-flex items-center gap-1"
+            ><i data-lucide="calendar" class="h-3.5 w-3.5"></i>
+            {% if task.due_date %}{{ task.due_date|date:"M d, Y" }}{% else %}No due date{% endif %}</span
+          >
+        </div>
+      </div>
+
+      <div x-data="{ open: false }" class="relative shrink-0">
+        <button
+          type="button"
+          @click="open = !open"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#bccac0] text-[#3d4a42] hover:bg-[#f7f9fb]"
+          aria-label="Task actions"
+        >
+          <i data-lucide="more-vertical" class="h-4 w-4"></i>
+        </button>
+        <div
+          x-show="open"
+          x-cloak
+          @click.outside="open = false"
+          class="absolute right-0 mt-2 w-44 rounded-xl border border-[#bccac0]/70 bg-white p-1 shadow-lg z-50"
+        >
+          <a
+            href="{% url 'tasks:detail' task.id %}"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#3d4a42] hover:bg-[#f7f9fb]"
+          >
+            <i data-lucide="external-link" class="h-4 w-4"></i> Open
+          </a>
+          <button
+            type="button"
+            @click="open = false; $dispatch('confirm-action', { title: 'Archive task', message: 'Archive this task? You can keep the workspace focused without deleting it.', action: '{% url 'tasks:archive' task.id %}' })"
+            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[#3d4a42] hover:bg-[#f7f9fb]"
+          >
+            <i data-lucide="archive" class="h-4 w-4"></i> Archive
+          </button>
+          <button
+            type="button"
+            @click="open = false; $dispatch('confirm-action', { title: 'Delete task', message: 'This action cannot be undone. The task will be permanently removed.', action: '{% url 'tasks:delete' task.id %}' })"
+            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-[#ba1a1a] hover:bg-red-50"
+          >
+            <i data-lucide="trash-2" class="h-4 w-4"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </article>

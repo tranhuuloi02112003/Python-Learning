@@ -1,0 +1,49 @@
+{% extends "base_pro.html" %}
+
+{% block title %}{{ page_title }} - TaskLog PRO{% endblock %}
+
+{% block content %}
+  <section>
+    <h1 class="font-display text-4xl font-extrabold tracking-tight text-[#191c1e]">{{ page_title }}</h1>
+    <p class="mt-3 text-xl text-[#3d4a42]">{{ page_description }}</p>
+
+    <div class="mt-8 rounded-2xl border border-blue-100 bg-blue-50/70 px-6 py-5 text-[#294766]">
+      <div class="flex items-start gap-4">
+        <span class="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white text-[#059669]">
+          <i data-lucide="info" class="h-4 w-4"></i>
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold text-[#28435d]">Clear your mind</h2>
+          <p class="mt-1 text-sm leading-6 text-[#46627c]">
+            Inbox holds quick tasks and loose ideas before they belong to a project. Capture first, organize later.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <a href="{% url 'tasks:inbox' %}{% if current_filters.q %}?q={{ current_filters.q }}{% endif %}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] {% if current_filters.created != 'today' and current_filters.deadline != 'yes' %}bg-[#0b7a53] text-white{% else %}border border-[#bccac0] bg-white text-[#191c1e]{% endif %}">All Unassigned</a>
+      <a href="{% url 'tasks:inbox' %}?created=today{% if current_filters.q %}&q={{ current_filters.q }}{% endif %}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] {% if current_filters.created == 'today' %}bg-[#0b7a53] text-white{% else %}border border-[#bccac0] bg-white text-[#191c1e]{% endif %}">Created Today</a>
+      <a href="{% url 'tasks:inbox' %}?deadline=yes{% if current_filters.q %}&q={{ current_filters.q }}{% endif %}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] {% if current_filters.deadline == 'yes' %}bg-[#0b7a53] text-white{% else %}border border-[#bccac0] bg-white text-[#191c1e]{% endif %}">With Deadline</a>
+      <form method="get" class="ml-auto flex items-center gap-3">
+        {% if current_filters.q %}<input type="hidden" name="q" value="{{ current_filters.q }}" />{% endif %}
+        {% if current_filters.created %}<input type="hidden" name="created" value="{{ current_filters.created }}" />{% endif %}
+        {% if current_filters.deadline %}<input type="hidden" name="deadline" value="{{ current_filters.deadline }}" />{% endif %}
+        <select name="sort" onchange="this.form.submit()" class="h-11 rounded-xl border border-[#bccac0] bg-white px-4 text-sm text-[#3d4a42] outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20">
+          <option value="newest" {% if current_filters.sort == "newest" or not current_filters.sort %}selected{% endif %}>Newest First</option>
+          <option value="oldest" {% if current_filters.sort == "oldest" %}selected{% endif %}>Oldest First</option>
+          <option value="due_date" {% if current_filters.sort == "due_date" %}selected{% endif %}>Deadline</option>
+          <option value="priority" {% if current_filters.sort == "priority" %}selected{% endif %}>Priority</option>
+        </select>
+      </form>
+    </div>
+
+    <div class="mt-8 space-y-4">
+      {% for task in tasks %}
+        {% include "tasks/components/task_list_row.html" with task=task show_created=True show_priority=True %}
+      {% empty %}
+        {% include "tasks/components/task_empty_state.html" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

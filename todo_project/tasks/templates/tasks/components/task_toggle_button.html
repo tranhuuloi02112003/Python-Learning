@@ -1,0 +1,15 @@
+<form method="post" action="{% url 'tasks:toggle' task.id %}" class="{{ form_class|default:'' }}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+  <button
+    type="submit"
+    class="flex h-6 w-6 items-center justify-center rounded-full border border-[#bccac0] bg-white text-white transition hover:border-[#059669]"
+    aria-label="{% if task.is_done %}Restore task{% else %}Mark task done{% endif %}"
+  >
+    {% if task.is_done %}
+      <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#059669]">
+        <i data-lucide="check" class="h-4 w-4"></i>
+      </span>
+    {% endif %}
+  </button>
+</form>

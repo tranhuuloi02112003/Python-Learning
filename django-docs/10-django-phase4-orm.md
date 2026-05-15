@@ -191,3 +191,192 @@ User.objects.all().update(score=F('score') + 1)
 ---
 
 **Tóm tắt Phase 4:** Bạn không bao giờ phải động tay vào một dòng SQL nào cả. ORM của Django đã cung cấp cho bạn một cái điều khiển từ xa cực kỳ xịn để thao tác với Database và nối các bảng lại với nhau một cách diệu kỳ.
+
+---
+
+## 7. Ghi chú ORM từ project Todo hiện tại
+
+Phần này gom các cú pháp đã gặp trong `tasks/selectors.py`, `projects/selectors.py`, `models.py`, `services.py`.
+
+### A. `__` lookup syntax
+
+Django dùng dấu `__` để query nâng cao:
+
+```python
+Task.objects.filter(project__isnull=True)
+```
+
+Đọc là:
+
+```txt
+Lấy Task có project là NULL.
+```
+
+Các ví dụ trong project:
+
+```python
+project__isnull=True
+due_date__isnull=False
+created_at__date=timezone.localdate()
+due_date__gt=today
+due_date__lt=today
+status__in=[TaskStatus.DONE, TaskStatus.CANCELLED]
+title__icontains=search
+```
+
+Ý nghĩa:
+
+- `isnull`: kiểm tra NULL.
+- `date`: lấy phần ngày từ DateTimeField.
+- `gt`: lớn hơn.
+- `lt`: nhỏ hơn.
+- `in`: nằm trong list.
+- `icontains`: chứa text, không phân biệt hoa thường.
+
+### B. `related_name`
+
+Trong `Task` model:
+
+```python
+project = models.ForeignKey(
+    "projects.Project",
+    related_name="tasks",
+)
+```
+
+Chiều thuận:
+
+```python
+task.project
+```
+
+Lấy project của task.
+
+Chiều ngược:
+
+```python
+project.tasks.all()
+```
+
+Lấy các task thuộc project đó.
+
+Vì vậy trong selector có thể viết:
+
+```python
+Count("tasks")
+```
+
+`"tasks"` ở đây không phải file, mà là tên quan hệ ngược từ `Project` sang `Task`.
+
+### C. `select_related()`
+
+Ví dụ:
+
+```python
+Task.objects.filter(is_archived=False).select_related("project")
+```
+
+Ý nghĩa:
+
+```txt
+Khi lấy Task, lấy kèm Project của task đó luôn.
+```
+
+Không có `select_related`, khi template gọi:
+
+```django
+{{ task.project.name }}
+```
+
+Django có thể phải query thêm project.
+
+Có `select_related("project")`, Django dùng JOIN để lấy sẵn project, giảm query database.
+
+Lưu ý:
+
+```txt
+select_related không chặn truy cập gì cả.
+Nó chỉ tối ưu bằng cách lấy sẵn object liên quan.
+```
+
+### D. `annotate()`, `Count()` và `Q()`
+
+Ví dụ trong `projects/selectors.py`:
+
+```python
+Project.objects.exclude(status=ProjectStatus.ARCHIVED).annotate(
+    total_tasks=Count("tasks", filter=Q(tasks__is_archived=False)),
+    done_tasks=Count(
+        "tasks",
+        filter=Q(tasks__is_archived=False, tasks__status="done"),
+    ),
+)
+```
+
+`annotate()` thêm field tính toán tạm vào mỗi object trong kết quả query.
+
+Ví dụ một project có 5 task chưa archived, trong đó 2 task done:
+
+```python
+project.total_tasks  # 5
+project.done_tasks   # 2
+```
+
+Hai field này không nằm thật trong database. Chúng chỉ có trên object trả về từ query đó.
+
+`Q(...)` là object điều kiện query:
+
+```python
+Q(tasks__is_archived=False, tasks__status="done")
+```
+
+Đọc là:
+
+```txt
+Task chưa archived AND status là done.
+```
+
+### E. `update_fields`
+
+```python
+project.save(update_fields=["status", "updated_at"])
+```
+
+Ý nghĩa:
+
+```txt
+Chỉ lưu các field được liệt kê xuống database.
+```
+
+Vì `updated_at` có `auto_now=True`, nếu dùng `update_fields`, muốn timestamp được ghi xuống DB thì vẫn nên liệt kê `"updated_at"`.
+
+### F. `**data` và `data.items()`
+
+```python
+Project.objects.create(**data)
+```
+
+Nếu:
+
+```python
+data = {"name": "Website", "status": "active"}
+```
+
+thì tương đương:
+
+```python
+Project.objects.create(name="Website", status="active")
+```
+
+`**data` bung dictionary thành keyword arguments.
+
+Với update động:
+
+```python
+for field, value in data.items():
+    setattr(project, field, value)
+```
+
+- Nếu chỉ lặp qua `data`, Python chỉ trả về key.
+- `data.items()` lấy cả key và value.
+- `setattr(project, "name", "New Project")` tương đương `project.name = "New Project"`.

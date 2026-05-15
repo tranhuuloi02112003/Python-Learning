@@ -1,101 +1,170 @@
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
-from .models import Task, Project
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views import View
+from django.views.generic import DetailView
+
 from .forms import TaskForm
+from .models import Task
+from . import selectors, services
 
-# Create your views here.
-def home_page(request):
-    # Hiển thị theo thứ tự từ mới nhất
-    tasks = Task.objects.all().order_by('-created_at')
-    projects = Project.objects.all()
+# Class base
+class TaskListView(View):
+    template_name = "tasks/all_tasks.html"
+    page_title = "All Tasks"
+    page_description = "Everything that is active across your workspace."
+    active_nav = "all"
+    topbar_search_placeholder = "Search tasks..."
+    selector = staticmethod(selectors.get_all_tasks)
 
-    # --------- LOGIC LỌC THEO PROJECT ---------
-    project_id = request.GET.get('project')
-    selected_project_id = None
-    
-    if project_id:
-        tasks = tasks.filter(project_id=project_id)
-        selected_project_id = int(project_id)
-
-    # --------- LOGIC LỌC THEO STATUS ---------
-    status_filter = request.GET.get('status')
-
-    if status_filter == 'done':
-        tasks = tasks.filter(completed = True)
-    elif status_filter == 'active':
-        tasks = tasks.filter(completed = False)
-
-    form = TaskForm() # Default input rỗng
-    #Check xem có đang edit không
-    edit_id = request.GET.get('edit')
-    task_to_edit = None
-
-    if edit_id:
-        # 1. Nếu dùng: Task.objects.get(id=edit_id)
-        #    -> Sập web (Lỗi 500 Server Error) nếu người dùng gõ bậy bạ một ID không có thực lên thanh URL.
-        # 2. LUÔN LUÔN DÙNG: get_object_or_404(Task, id=edit_id)
-        #    -> An toàn tuyệt đối! Nếu không tìm thấy, nó sẽ ném ra trang "Lỗi 404 - Không tìm thấy" (chuyên nghiệp như các web lớn).
-        task_to_edit = get_object_or_404(Task, id=edit_id)
-        form = TaskForm(instance=task_to_edit)
-
-    else: 
-        form = TaskForm()
-
-    # Nếu người dùng bấm nút "Thêm việc"
-    if request.method == "POST":
-        # Lấy dữ liệu người dùng vừa nhập
-        form = TaskForm(request.POST)
-
-        # Kiểm tra dữ liệu hợp lệ không
-        if form.is_valid():
-            form.save()
-            return redirect('home')  # Xong thì tải lại trang chủ ('/')
-    
-    # Render ra trang HTML với data
-    return render(request, 'tasks/base_pro.html', {
-        'tasks': tasks, 
-        'projects': projects,
-        'selected_project_id': selected_project_id,
-        'form': form, 
-        'task_to_edit': task_to_edit,
-        'current_status': status_filter
-    })
-
-def delete_task(req, pk):
-    # Tìm cái task có ID đó, không thấy thì báo lỗi 404
-    task = get_object_or_404(Task, id = pk)
-
-    task.delete()
-    return redirect('home')
-
-def edit_task(req, pk):
-    # Tìm cái task có ID đó
-    task = get_object_or_404(Task, id=pk)
-
-    if req.method == "POST":
-        form = TaskForm(req.POST, instance=task)
-        if form.is_valid():
-            form.save()
-        return redirect('home')
-
-    # Nếu vô tình truy cập bằng đường link (GET request) thì đá về trang chủ chế độ sửa
-    return redirect(f"/?edit={task.id}")
-
-def create_project(req):
-    if req.method == "POST":
-        project_name = req.POST.get('name')
-        color_theme = req.POST.get('color_theme')
-
-        Project.objects.create(
-            name = project_name,
-            color_theme = color_theme
+    def get(self, request):
+        # request.GET là query params trên URL.
+        tasks = self.selector(request.GET)
+        return render(
+            request,
+            self.template_name,
+            {
+                "tasks": tasks,
+                "page_title": self.page_title,
+                "page_description": self.page_description,
+                "active_nav": self.active_nav,
+                "current_filters": request.GET,
+                "topbar_search_action": request.path,
+                "topbar_search_placeholder": self.topbar_search_placeholder,
+            },
         )
-    return redirect('home')
-    
-def toggle_task(req, pk):
-    if req.method == "POST":
-        task = get_object_or_404(Task, id=pk)
-        task.completed = not task.completed
-        task.save()
-    return redirect('home')
+
+
+class AllTasksView(TaskListView):
+    pass
+
+
+class InboxView(TaskListView):
+    template_name = "tasks/inbox.html"
+    page_title = "Inbox"
+    page_description = "Tasks not assigned to a project yet."
+    active_nav = "inbox"
+    topbar_search_placeholder = "Search inbox tasks..."
+    selector = staticmethod(selectors.get_inbox_tasks)
+
+
+class TodayView(TaskListView):
+    template_name = "tasks/today.html"
+    page_title = "Today"
+    page_description = "Tasks due today that still need attention."
+    active_nav = "today"
+    topbar_search_placeholder = "Search today's work..."
+    selector = staticmethod(selectors.get_today_tasks)
+
+    def get(self, request):
+        tasks = self.selector(request.GET)
+        completed_tasks = selectors.get_today_completed_tasks()
+        return render(
+            request,
+            self.template_name,
+            {
+                "tasks": tasks,
+                "completed_tasks": completed_tasks,
+                "today_stats": {
+                    "total": len(tasks) + len(completed_tasks),
+                    "completed": len(completed_tasks),
+                    "remaining": len(tasks),
+                },
+                "page_title": self.page_title,
+                "page_description": self.page_description,
+                "active_nav": self.active_nav,
+                "current_filters": request.GET,
+                "topbar_search_action": request.path,
+                "topbar_search_placeholder": self.topbar_search_placeholder,
+            },
+        )
+
+
+class UpcomingView(TaskListView):
+    template_name = "tasks/upcoming.html"
+    page_title = "Upcoming"
+    page_description = "Future work ordered by your filters."
+    active_nav = "upcoming"
+    topbar_search_placeholder = "Search upcoming work..."
+    selector = staticmethod(selectors.get_upcoming_tasks)
+
+
+class OverdueView(TaskListView):
+    template_name = "tasks/overdue.html"
+    page_title = "Overdue"
+    page_description = "Past due tasks that are not done or cancelled."
+    active_nav = "overdue"
+    topbar_search_placeholder = "Search overdue tasks..."
+    selector = staticmethod(selectors.get_overdue_tasks)
+
+
+class CompletedView(TaskListView):
+    template_name = "tasks/completed.html"
+    page_title = "Completed"
+    page_description = "Finished work that is still visible in your workspace."
+    active_nav = "completed"
+    topbar_search_placeholder = "Search completed tasks..."
+    selector = staticmethod(selectors.get_completed_tasks)
+
+# Các view chi tiết, tạo/sửa task
+class TaskCreateView(View):
+    def post(self, request):
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            services.create_task(form)
+            messages.success(request, "Task created.")
+            return redirect(request.POST.get("next") or "tasks:all")
+        messages.error(request, "Task could not be created. Please check your input.")
+        return redirect(request.POST.get("next") or "tasks:all")
+
+
+class TaskUpdateView(View):
+    def post(self, request, pk):
+        # pk được Django lấy từ URL pattern <int:pk> và truyền vào method post().
+        task = get_object_or_404(Task, pk=pk)
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            services.update_task(form)
+            messages.success(request, "Task updated.")
+        else:
+            messages.error(request, "Task could not be updated.")
+        return redirect("tasks:detail", pk=task.pk)
+
+
+class TaskDetailView(DetailView):
+    model = Task
+    template_name = "tasks/detail.html"
+    context_object_name = "task"
+
+    def get_queryset(self):
+        # Override get_queryset() của DetailView để chỉ cho phép lấy task chưa archived.
+        return selectors.base_tasks()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["active_nav"] = "all"
+        context["edit_task_form"] = TaskForm(instance=self.object)
+        return context
+
+
+def task_toggle(request, pk):
+    if request.method == "POST":
+        task = get_object_or_404(Task, pk=pk)
+        services.toggle_task_done(task)
+        messages.success(request, "Task status updated.")
+    return redirect(request.POST.get("next") or "tasks:all")
+
+
+def task_archive(request, pk):
+    if request.method == "POST":
+        task = get_object_or_404(Task, pk=pk)
+        services.archive_task(task)
+        messages.success(request, "Task archived.")
+    return redirect(request.POST.get("next") or "tasks:all")
+
+
+def task_delete(request, pk):
+    if request.method == "POST":
+        task = get_object_or_404(Task, pk=pk)
+        services.delete_task(task)
+        messages.success(request, "Task deleted.")
+    return redirect(request.POST.get("next") or "tasks:all")

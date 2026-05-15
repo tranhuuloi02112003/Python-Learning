@@ -1,0 +1,29 @@
+<form method="get" class="flex flex-wrap items-center gap-3">
+  <div class="relative w-full max-w-xl flex-1">
+    <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#3d4a42]/60"></i>
+    <input name="q" value="{{ current_filters.q }}" placeholder="Search tasks..." class="h-10 w-full rounded-lg border border-[#bccac0] bg-white pl-10 pr-4 text-sm outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20" />
+  </div>
+  <select name="status" class="h-10 rounded-lg border border-[#bccac0] bg-white px-3 text-sm outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20">
+    <option value="">Any status</option>
+    <option value="todo" {% if current_filters.status == "todo" %}selected{% endif %}>Todo</option>
+    <option value="in_progress" {% if current_filters.status == "in_progress" %}selected{% endif %}>In progress</option>
+    <option value="done" {% if current_filters.status == "done" %}selected{% endif %}>Done</option>
+    <option value="cancelled" {% if current_filters.status == "cancelled" %}selected{% endif %}>Cancelled</option>
+  </select>
+  <select name="project" class="h-10 rounded-lg border border-[#bccac0] bg-white px-3 text-sm outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20">
+    <option value="">Any project</option>
+    {% for project in sidebar_projects %}
+      <option value="{{ project.id }}" {% if current_filters.project == project.id|stringformat:"s" %}selected{% endif %}>{{ project.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="sort" class="ml-auto h-10 rounded-lg border border-[#bccac0] bg-white px-3 text-sm outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/20">
+    <option value="newest" {% if current_filters.sort == "newest" or not current_filters.sort %}selected{% endif %}>Newest</option>
+    <option value="oldest" {% if current_filters.sort == "oldest" %}selected{% endif %}>Oldest</option>
+    <option value="due_date" {% if current_filters.sort == "due_date" %}selected{% endif %}>Due date</option>
+    <option value="priority" {% if current_filters.sort == "priority" %}selected{% endif %}>Priority</option>
+  </select>
+  <button type="submit" class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white hover:bg-[#006948]">
+    <i data-lucide="sliders-horizontal" class="h-4 w-4"></i> Apply
+  </button>
+</form>
+

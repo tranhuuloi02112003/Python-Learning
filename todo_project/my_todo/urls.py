@@ -19,6 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Chuyển mọi request trang chủ tới file urls của app tasks
-    path('', include('tasks.urls')),
+    path('', include('dashboard.urls')),
+    path('tasks/', include('tasks.urls')),
+    path('projects/', include('projects.urls')),
 ]
