@@ -1,3 +1,7 @@
-{
-    "python.defaultInterpreterPath": "${workspaceFolder}/todo_project/.venv/bin/python"
-}
+// {
+//     "python.defaultInterpreterPath": "${workspaceFolder}/todo_project/.venv/bin/python"
+// }
+
+// {
+//   "python.defaultInterpreterPath": "${workspaceFolder}/todo_project-drf/.venv/bin/python"
+// }

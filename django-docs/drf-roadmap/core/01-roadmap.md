@@ -182,6 +182,19 @@ Task.objects.filter(Q(title__icontains="bug") | Q(description__icontains="bug"))
 Task.objects.filter(id=1).update(priority=F("priority") + 1)
 ```
 
+**Nhóm 6 – Transaction khi write API:**
+
+```python
+from django.db import transaction
+
+with transaction.atomic():
+    project.save()
+    Task.objects.bulk_create(new_tasks)
+```
+
+Khi một API create/update nhiều record liên quan nhau, đọc thêm:
+`focus/13-django-transactions-in-api-basic.md`.
+
 ---
 
 ### Phase 1: API Flow Cơ Bản
@@ -477,36 +490,179 @@ Bước 5: models.py → DepartmentInfo
 
 ---
 
-## Phần 5: Tổng Kết Thứ Tự Học
+## Phần 5: Custom Base Class Của Dự Án
+
+> **Học SAU khi đã hiểu DRF cơ bản.** Không nhảy vào đây trước.
+
+Dự án thực tế thường có custom base class bọc lại DRF:
+
+```txt
+__Common/viewsets/_base_viewset.py    → BaseHandleAPI (kế thừa GenericViewSet)
+__Common/viewsets/response_status.py  → ResponseStatus (kế thừa BaseHandleAPI)
+```
+
+**Chuỗi kế thừa:**
+
+```txt
+DRF GenericViewSet
+    └── BaseHandleAPI        ← Team tự viết: thêm helper xử lý chung
+        └── ResponseStatus   ← Team tự viết: chuẩn hóa response format
+            └── DepartmentView   ← View cụ thể của module
+```
+
+**Các helper cần hiểu:**
+
+| Helper | Chức năng |
+|:-------|:----------|
+| `_response_status_200(data_return=...)` | Trả response thành công chuẩn |
+| `_response_status_400_bad_request(...)` | Trả response lỗi validation |
+| `ProcessData` | Xử lý/transform data trước khi trả |
+| `pagination_list_data(...)` | Phân trang kết quả list |
+| `get_filter_obj(...)` | Lọc queryset theo query params |
+
+**Thứ tự đọc:**
+1. Hiểu `GenericViewSet` gốc của DRF là gì
+2. Mở `_base_viewset.py` → xem `BaseHandleAPI` thêm gì
+3. Mở `response_status.py` → xem `ResponseStatus` bọc response như nào
+4. Sau đó mới đọc view cụ thể của module
+
+---
+
+## Phần 6: Docker / Local Env / Swagger
+
+> **Mục tiêu:** Tự chạy được backend local, vào Swagger test API, đọc log khi lỗi.
+
+### Docker – Học vừa đủ
+
+Dự án thường có 2 service chính: `mysql-server` + `api-server`.
+
+**Các lệnh cần biết:**
+
+```bash
+# Khởi động tất cả services
+docker compose up -d
+
+# Dừng tất cả
+docker compose down
+
+# Xem log (quan trọng nhất khi debug!)
+docker compose logs -f api-server
+docker compose logs -f mysql-server
+
+# Vào trong container chạy lệnh Django
+docker compose exec api-server bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+**Concepts Docker cần hiểu:**
+
+| Concept | Giải thích đơn giản |
+|:--------|:--------------------|
+| **Image** | "Bản thiết kế" – chứa code + dependencies |
+| **Container** | "Ngôi nhà" – instance đang chạy từ image |
+| **Volume** | "Ổ cứng gắn ngoài" – giữ data khi container restart (MySQL data) |
+| **Port mapping** | `8000:8000` – port máy host : port trong container |
+| **Environment** | `.env` file – chứa DB password, SECRET_KEY... |
+| **docker-compose.yml** | File định nghĩa tất cả services + quan hệ giữa chúng |
+
+> 💡 **Tip:** Mở `docker-compose.yml` đọc trước để biết service nào phụ thuộc service nào (VD: `api-server` depends_on `mysql-server`).
+
+### Swagger – Test API nhanh
+
+```txt
+Sau khi chạy Docker, mở: http://localhost:8000/doc/
+
+→ Swagger UI hiển thị tất cả API endpoints
+→ Click vào endpoint → Try it out → Execute
+→ Xem request/response format thực tế
+```
+
+---
+
+## Phần 7: Những Gì Tạm Hoãn (Chưa Cần Vội)
+
+| Kiến thức | Lý do hoãn |
+|:----------|:-----------|
+| Django Template nâng cao | Dự án API không dùng |
+| Custom template tags | Không có template |
+| Context processors nâng cao | Không có template context |
+| Django Admin nâng cao | Biết cơ bản là đủ |
+| Docker production | Học sau khi dev ổn |
+| CI/CD | DevOps lo, dev biết concept là đủ |
+| Celery / Redis | Async task – học khi gặp |
+| Caching | Performance – học khi cần optimize |
+| Signals nâng cao | Ít dùng, dễ gây side effect |
+| Testing nâng cao | Học sau khi đã code được feature |
+
+> Không phải không quan trọng – nhưng **không phải thứ giúp đọc hiểu dự án API nhanh nhất**.
+
+---
+
+## Phần 8: Tổng Kết
+
+### Sơ đồ lộ trình
 
 ```txt
                     ┌─ Bạn đang ở đây
                     ▼
 ╔══════════════════════════════════════════════╗
-║  Phase 0: Ôn ORM chắc                       ║  ← NỀN TẢNG (1-2 tuần)
-║  filter, lookup, related, select_related,    ║
-║  prefetch_related, annotate, Q, F            ║
+║  Phase 0: Ôn Django Core                    ║  ← NỀN TẢNG
+║  settings, urls, models, migrations, apps   ║
 ╠══════════════════════════════════════════════╣
-║  Phase 1: API Flow cơ bản                   ║  ← HIỂU CONCEPT (3-5 ngày)
+║  Phase 1: Ôn ORM chắc                       ║  ← NỀN TẢNG (1-2 tuần)
+║  filter, lookup, related, select_related,    ║
+║  prefetch_related, annotate, Q, F,           ║
+║  values, values_list                         ║
+╠══════════════════════════════════════════════╣
+║  Phase 2: API Flow cơ bản                   ║  ← HIỂU CONCEPT (3-5 ngày)
 ║  request, response, status code, HTTP method ║
 ╠══════════════════════════════════════════════╣
-║  Phase 2: Serializer                         ║  ← TRỌNG TÂM (1-2 tuần)
+║  Phase 3: Serializer                         ║  ← TRỌNG TÂM (1-2 tuần)
 ║  ModelSerializer, validate, fields, source,  ║
 ║  SerializerMethodField, many=True            ║
 ╠══════════════════════════════════════════════╣
-║  Phase 3: APIView / ViewSet                  ║  ← ÁP DỤNG (1 tuần)
-║  GenericViewSet, as_view, custom base class  ║
+║  Phase 4: APIView / ViewSet                  ║  ← ÁP DỤNG (1 tuần)
+║  GenericViewSet, as_view, request.data       ║
 ╠══════════════════════════════════════════════╣
-║  Phase 4: Permission / Auth                  ║  ← BỔ SUNG (3-5 ngày)
-║  IsAuthenticated, request.user, token        ║
+║  Phase 5: Permission + Pagination + Filter  ║  ← BỔ SUNG (1 tuần)
+║  IsAuthenticated, query_params, ordering     ║
 ╠══════════════════════════════════════════════╣
-║  Phase 5: Pagination / Filter / Search       ║  ← THỰC TẾ (3-5 ngày)
-║  query_params, page, ordering, Q search      ║
+║  Phase 6: Custom base class của dự án        ║  ← ĐỌC SOURCE (3-5 ngày)
+║  BaseHandleAPI, ResponseStatus, helpers      ║
 ╠══════════════════════════════════════════════╣
-║  Phase 6: Đọc source dự án thực tế           ║  ← MỤC TIÊU CUỐI
-║  Trace endpoint, custom base class, Docker   ║
+║  Phase 7: Docker + Swagger                   ║  ← CHẠY THỰC TẾ (2-3 ngày)
+║  compose up, logs, test API, đọc log lỗi    ║
+╠══════════════════════════════════════════════╣
+║  Phase 8: Trace endpoint + tự sửa API       ║  ← MỤC TIÊU CUỐI
+║  Trace 3-5 endpoint → sửa 1 API đơn giản   ║
 ╚══════════════════════════════════════════════╝
 ```
 
-> **Tổng thời gian ước tính:** 5-8 tuần nếu học đều đặn mỗi ngày.
+### 10 Bước Dễ Nhớ
+
+```txt
+ 1. Ôn Django project/app/settings/urls/models/migrations
+ 2. Ôn ORM thật chắc (filter, lookup, related, annotate, Q)
+ 3. Học Serializer như "phiên bản API của ModelForm"
+ 4. Học DRF ViewSet / APIView / Response / request.data
+ 5. Học flow:  urls.py → ViewSet → ORM/service → Serializer → JSON
+ 6. Đọc custom BaseHandleAPI / ResponseStatus của team
+ 7. Chạy Docker local + Swagger
+ 8. Trace từng API nhỏ (dùng checklist 13 câu hỏi)
+ 9. Tự sửa một API list/detail/create/update đơn giản
+10. Sau đó mới học test API
+```
+
+### Chuyển tư duy – Một câu duy nhất
+
+```txt
+CŨ:  request → urls.py → view → form/model    → template → HTML Response
+MỚI: request → urls.py → ViewSet → ORM/service → serializer → JSON Response
+```
+
+> **Bạn không cần học lại từ đầu.** Chỉ cần thay `forms + templates` bằng `serializers + Response`.
+> Toàn bộ phần còn lại (urls, models, ORM, services) – bạn đã biết rồi.
+
+> **Tổng thời gian ước tính:** 6-10 tuần nếu học đều đặn mỗi ngày.
 > **Nguyên tắc:** Mỗi phase xong → viết 1 mini API project nhỏ để thực hành trước khi sang phase tiếp.

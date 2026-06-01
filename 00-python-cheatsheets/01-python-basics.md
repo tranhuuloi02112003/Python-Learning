@@ -62,6 +62,12 @@ Python cực kỳ đa năng, có thể ứng dụng trong:
 ### Điều khiển luồng
 
 - Dùng `if`, `elif`, `else` cho điều kiện.
+- Viết gọn `if/else` khi cần trả ra một giá trị: `value_if_true if condition else value_if_false`.
+
+```python
+display_name = user.name if user else None
+```
+
 - Dùng `for ... in ...` để duyệt mảng hoặc object.
 - Định nghĩa hàm bằng từ khóa `def`.
 

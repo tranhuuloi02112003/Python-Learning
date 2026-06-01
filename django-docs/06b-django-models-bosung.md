@@ -24,6 +24,8 @@ code = models.CharField(max_length=10, blank=True)         # Không NULL, nhưng
 
 ### `choices` – Giới hạn giá trị hợp lệ
 
+`choices` dùng để giới hạn các giá trị nên chọn cho field. Với một cặp choice như `("low", "Thấp")`, `"low"` là giá trị lưu trong DB, còn `"Thấp"` là label hiển thị.
+
 ```python
 class Task(models.Model):
     # Cách 1: Dùng list of tuples
