@@ -221,23 +221,114 @@ Validation có xảy ra trước write không?
 
 ## 8. `atomic` lồng nhau và savepoint
 
-Bạn có thể gặp:
+### 8.1 Hai trường hợp khi gặp `atomic` lồng nhau
+
+Django phân biệt dựa vào context đang có transaction hay chưa:
+
+| Tình huống | Kết quả |
+|:---|:---|
+| `atomic()` chạy khi **không có** transaction nào đang active | Tạo transaction mới |
+| `atomic()` chạy khi **đã có** transaction đang active bên ngoài | Tạo savepoint, không tạo transaction mới |
+
+Ví dụ hay gặp:
+
+```python
+with transaction.atomic():       # -> tạo transaction
+    create_parent()
+
+    with transaction.atomic():   # -> tạo savepoint (vì đang trong transaction rồi)
+        create_children()
+```
+
+---
+
+### 8.2 Savepoint hoạt động như thế nào
+
+Savepoint là điểm đánh dấu trong transaction. Khi inner block kết thúc:
+
+**Inner block thành công (không có exception):**
+
+```text
+Savepoint được release.
+Data chưa commit ra DB thật - vẫn nằm trong transaction của outer.
+Outer block vẫn có thể rollback tất cả, kể cả phần inner đã "xong".
+```
+
+**Inner block fail (có exception thoát ra):**
+
+```text
+Rollback về savepoint - chỉ hoàn tác những gì inner block đã làm.
+Outer transaction vẫn còn sống.
+Outer có thể tiếp tục các write khác hoặc commit phần còn lại.
+```
+
+Minh họa:
+
+```python
+with transaction.atomic():         # bắt đầu transaction
+    create_parent()                # write 1
+
+    try:
+        with transaction.atomic(): # tạo savepoint
+            create_children()      # write 2
+            raise ValueError()     # exception thoát inner block
+                                   # -> rollback về savepoint, huỷ write 2
+    except ValueError:
+        pass                       # bắt ở ngoài inner, outer vẫn sống
+
+    create_summary()               # write 3 vẫn chạy bình thường
+
+# kết thúc outer -> commit write 1 và write 3, write 2 đã rollback
+```
+
+Nếu outer fail:
 
 ```python
 with transaction.atomic():
     create_parent()
 
     with transaction.atomic():
-        create_children()
+        create_children()          # inner thành công, savepoint released
+
+    raise Exception()              # outer fail -> rollback toàn bộ transaction
+                                   # kể cả phần create_children() dù inner đã "xong"
 ```
 
-Đọc mức basic:
+---
 
-- Outer `atomic` là transaction lớn.
-- Inner `atomic` thường tạo savepoint.
-- Inner block thành công vẫn có thể bị rollback nếu outer block về sau fail.
+### 8.3 Điểm dễ nhầm
 
-Chưa cần đào sâu savepoint cho đến khi project có code nested transaction thật.
+**Inner `atomic` thành công không có nghĩa là data đã commit.**
+
+Data chỉ thật sự commit khi outer transaction commit. Inner chỉ quyết định xem phần của nó có bị rollback về savepoint hay không.
+
+---
+
+### 8.4 `savepoint=False`
+
+Đôi khi gặp:
+
+```python
+with transaction.atomic(savepoint=False):
+    ...
+```
+
+Ý nghĩa: nếu đang trong transaction rồi, inner block này không tạo savepoint.
+
+Hệ quả: nếu inner block fail, exception sẽ làm hỏng cả outer transaction (Django đánh dấu transaction là "needs rollback").
+
+Dùng khi nào: rất hiếm, thường là khi cố tình muốn inner failure kéo theo outer failure mà không muốn overhead của savepoint. Gặp trong code thì đọc kỹ comment xung quanh.
+
+---
+
+### 8.5 Khi đọc code có nested `atomic`
+
+Tự hỏi:
+
+```text
+Inner block fail -> outer có tiếp tục không hay cũng die?
+Inner block thành công -> outer có chỗ nào sau đó có thể làm rollback tất cả không?
+```
 
 ---
 

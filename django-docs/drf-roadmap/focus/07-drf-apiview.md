@@ -1,14 +1,5 @@
 # DRF APIView
 
-Bài này không học lại Django Class-Based View.
-
-Bạn đã biết CBV rồi, nên mình sẽ bỏ qua các phần như:
-
-- Class-based view là gì.
-- `get()`/`post()` method trong class là gì.
-- `as_view()` là gì.
-- `dispatch()` là gì.
-
 Bài này chỉ tập trung vào câu hỏi:
 
 ```text
@@ -20,13 +11,23 @@ Vì sao APIView là bước trung gian trước ViewSet/Router?
 
 ## 1. APIView là gì?
 
-Hiểu ngắn gọn:
+DRF có hai cách viết API:
 
 ```text
-APIView = Class-Based View dành cho API trong Django REST Framework
+@api_view  → function-based (FBV)
+APIView    → class-based (CBV)
 ```
 
-Cú pháp nhìn giống Django CBV:
+`APIView` là cách viết API theo dạng class trong DRF.
+
+Nó kế thừa từ `django.views.View` (base class của Django), rồi DRF extend thêm các behavior cho API:
+
+```text
+django.views.View
+    └── rest_framework.views.APIView  ← Django View + DRF behaviors
+```
+
+Vì vậy cú pháp nhìn giống Django CBV:
 
 ```python
 class TaskListAPIView(APIView):
@@ -34,30 +35,24 @@ class TaskListAPIView(APIView):
         ...
 ```
 
-Nhưng điểm quan trọng là:
+Nhưng bên trong, DRF đã thay thế/thêm:
 
-```text
-APIView thêm các behavior của DRF vào class view.
-```
-
-Theo docs DRF, APIView khác view thường ở chỗ:
-
-- Request truyền vào handler là DRF Request.
-- Handler có thể trả DRF Response.
+- `request` là DRF Request (không phải Django `HttpRequest`).
+- Response được xử lý theo kiểu API.
 - `APIException`, `Http404`, `PermissionDenied` được xử lý thành API response phù hợp.
 
 ---
 
 ## 2. So sánh nhanh Django CBV và DRF APIView
 
-| Django CBV | DRF APIView |
-|:---|:---|
-| Dùng cho web page / HTML | Dùng cho API |
-| Request là Django `HttpRequest` | Request là DRF `Request` |
-| Thường trả `render`, `redirect`, `HttpResponse` | Thường trả `Response` |
-| Form xử lý input | Serializer xử lý input/output |
-| Lỗi thường tự xử lý hoặc dùng Django exception | DRF exception handling trả response API |
-| Output thường là HTML | Output thường là JSON / Browsable API |
+| Django CBV                                      | DRF APIView                             |
+| :---------------------------------------------- | :-------------------------------------- |
+| Dùng cho web page / HTML                        | Dùng cho API                            |
+| Request là Django `HttpRequest`                 | Request là DRF `Request`                |
+| Thường trả `render`, `redirect`, `HttpResponse` | Thường trả `Response`                   |
+| Form xử lý input                                | Serializer xử lý input/output           |
+| Lỗi thường tự xử lý hoặc dùng Django exception  | DRF exception handling trả response API |
+| Output thường là HTML                           | Output thường là JSON / Browsable API   |
 
 Tư duy chuyển đổi:
 
@@ -240,12 +235,12 @@ APIView   = DRF base class cho class-based API
 
 So sánh nhanh:
 
-| `@api_view` | `APIView` |
-|:---|:---|
-| Function-based | Class-based |
+| `@api_view`                                               | `APIView`                                          |
+| :-------------------------------------------------------- | :------------------------------------------------- |
+| Function-based                                            | Class-based                                        |
 | Logic nhiều method thường dùng `if request.method == ...` | Tách thành `get`, `post`, `put`, `patch`, `delete` |
-| Dễ hiểu khi mới bắt đầu | Gọn hơn khi endpoint có nhiều method |
-| Phù hợp học Request/Response ban đầu | Phù hợp trước khi lên `GenericAPIView`/ViewSet |
+| Dễ hiểu khi mới bắt đầu                                   | Gọn hơn khi endpoint có nhiều method               |
+| Phù hợp học Request/Response ban đầu                      | Phù hợp trước khi lên `GenericAPIView`/ViewSet     |
 
 Ví dụ function-based:
 

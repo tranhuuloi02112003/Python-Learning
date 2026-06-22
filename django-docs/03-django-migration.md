@@ -79,11 +79,222 @@ python manage.py migrate
 
 ## 6. Những câu hỏi quan trọng để hiểu sâu về Django
 
-- **Migration conflict** là gì và xảy ra khi nào (làm việc nhóm nhiều người cùng sửa model)?
-- **`--fake` flag** trong `migrate` dùng để làm gì?
-- **`squashmigrations`** là gì và khi nào nên dùng để tối ưu số lượng file migration?
-- Sự khác biệt giữa **`on_delete=CASCADE`** và **`on_delete=SET_NULL`** trong Django ForeignKey?
-- Django ORM có thể hoạt động với **nhiều database** cùng lúc không?
+---
+
+### 6.1 Migration Conflict là gì?
+
+**Migration conflict** xảy ra khi **2 người cùng chạy `makemigrations`** từ cùng một file migration gốc, khiến Django tạo ra 2 file có cùng "cha" — tạo nên nhánh tách đôi trong lịch sử migration.
+
+#### Ví dụ tình huống thực tế
+
+```
+# Trên main branch: file cuối cùng là
+migrations/0003_add_status.py
+
+# Dev A thêm field "priority" → chạy makemigrations
+migrations/0004_add_priority.py   ← cha là 0003
+
+# Dev B thêm field "due_date" → chạy makemigrations
+migrations/0004_add_due_date.py   ← cha cũng là 0003 ← CONFLICT!
+```
+
+Khi merge code lên Git, Django thấy **2 file đều kế thừa từ 0003** → báo lỗi:
+
+```
+CommandError: Conflicting migrations detected; multiple leaf nodes
+in the migration graph: (0004_add_priority, 0004_add_due_date).
+```
+
+#### Cách giải quyết
+
+```bash
+# Django tự tạo file "merge" để hợp 2 nhánh lại
+python manage.py makemigrations --merge
+
+# File mới được tạo ra:
+migrations/0005_merge_0004_add_priority_0004_add_due_date.py
+```
+
+> **Quy tắc nhóm:** Sau khi merge, chạy `migrate` để đồng bộ. Nên **communicate** trong team trước khi sửa cùng một model.
+
+---
+
+### 6.2 Flag `--fake` trong `migrate` dùng để làm gì?
+
+`--fake` báo Django: **"Hãy đánh dấu migration này là đã chạy, nhưng ĐỪNG thực sự thay đổi Database."**
+
+#### Khi nào dùng?
+
+| Tình huống | Giải thích |
+|---|---|
+| Import DB từ bên ngoài (dump SQL) | DB đã có đúng cấu trúc, nhưng Django chưa biết |
+| Sửa thủ công DB trực tiếp | Bạn đã `ALTER TABLE` bằng tay, cần Django "công nhận" |
+| Reset trạng thái migration sai | Đánh dấu lại điểm xuất phát mà không mất data |
+
+#### Ví dụ thực tế
+
+```bash
+# Tình huống: bạn restore một DB backup đã có đầy đủ bảng,
+# nhưng bảng django_migrations trống (Django không biết).
+
+# SAI: chạy migrate bình thường sẽ lỗi "table already exists"
+python manage.py migrate
+
+# ĐÚNG: fake toàn bộ migrations để Django ghi nhận
+python manage.py migrate --fake
+
+# Hoặc fake từ một app cụ thể đến một điểm cụ thể
+python manage.py migrate myapp 0003 --fake
+```
+
+> ⚠️ **Cẩn thận:** `--fake` chỉ ghi vào bảng `django_migrations`, không chạm vào cấu trúc DB thật. Dùng sai có thể khiến DB và code bị lệch nhau.
+
+---
+
+### 6.3 `squashmigrations` là gì?
+
+Theo thời gian, thư mục `migrations/` có thể tích lũy **hàng trăm file** — mỗi lần sửa model là thêm 1 file. `squashmigrations` **gộp nhiều file migration thành 1 file duy nhất** để tối ưu.
+
+#### Khi nào nên dùng?
+
+- Dự án đã chạy lâu, có > 50 file migration trong 1 app.
+- Thời gian chạy `migrate` khi deploy lên server mới ngày càng chậm.
+- Cần "dọn dẹp" lịch sử migration cho gọn.
+
+#### Cú pháp
+
+```bash
+# Gộp tất cả migration từ 0001 đến 0050 thành 1 file
+python manage.py squashmigrations myapp 0001 0050
+
+# Kết quả: tạo ra file mới
+migrations/0001_squashed_0050_...py
+```
+
+#### Quy trình chuẩn sau khi squash
+
+```
+1. Chạy squashmigrations  →  file squashed được tạo
+2. Commit file squashed lên Git
+3. Deploy lên tất cả server, chạy migrate
+4. Xóa các file cũ (0001 → 0050) sau khi xác nhận tất cả server đã migrate
+5. Commit lần 2 xóa file cũ
+```
+
+> **Lưu ý:** Không xóa file cũ ngay vì các server khác có thể chưa chạy đến điểm squash.
+
+---
+
+### 6.4 `on_delete=CASCADE` vs `on_delete=SET_NULL` trong ForeignKey
+
+Khi bạn xóa một **bản ghi cha** (parent record), Django cần biết làm gì với các **bản ghi con** (child records) đang trỏ vào nó.
+
+#### So sánh trực quan
+
+```python
+# Ví dụ: Task thuộc về một Project
+class Task(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    # Nếu Project bị xóa → Task cũng bị xóa theo
+
+class Task(models.Model):
+    project = models.ForeignKey(Project, null=True, on_delete=models.SET_NULL)
+    # Nếu Project bị xóa → Task.project được set thành NULL (Task vẫn còn)
+```
+
+#### Bảng so sánh đầy đủ
+
+| `on_delete` | Hành động khi xóa Parent | Dùng khi nào |
+|---|---|---|
+| `CASCADE` | Xóa luôn tất cả Child | Child không có nghĩa nếu không có Parent (VD: OrderItem → Order) |
+| `SET_NULL` | Child.fk = NULL | Child vẫn có nghĩa độc lập (VD: Task → Project đã xóa) |
+| `PROTECT` | Ném lỗi, ngăn xóa Parent | Muốn bảo vệ dữ liệu, bắt buộc xóa child trước |
+| `SET_DEFAULT` | Child.fk = default value | Có giá trị mặc định hợp lý |
+| `DO_NOTHING` | Không làm gì (nguy hiểm!) | Hiếm gặp, tự xử lý ở tầng DB |
+| `RESTRICT` | Tương tự PROTECT nhưng thông minh hơn | Django 3.1+, kiểm tra cả cascade chain |
+
+#### Ví dụ trong Todo Project
+
+```python
+class Task(models.Model):
+    # Xóa Project → Xóa luôn các Task trong Project đó
+    project = models.ForeignKey(
+        'Project',
+        on_delete=models.CASCADE,
+        related_name='tasks'
+    )
+```
+
+---
+
+### 6.5 Django ORM với nhiều Database cùng lúc
+
+**Có!** Django hỗ trợ **multi-database** hoàn toàn, thông qua setting `DATABASES` và **Database Routers**.
+
+#### Cấu hình trong `settings.py`
+
+```python
+DATABASES = {
+    # Database mặc định (primary)
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'main_db',
+    },
+    # Database phụ (analytics, read replica...)
+    'analytics': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'analytics_db',
+    },
+}
+```
+
+#### Cách dùng trong code
+
+```python
+# Chỉ định rõ database khi query
+tasks = Task.objects.using('analytics').filter(status='done')
+
+# Hoặc khi save
+report = Report(title="Monthly")
+report.save(using='analytics')
+```
+
+#### Database Router — Tự động điều hướng
+
+```python
+# routers.py
+class AnalyticsRouter:
+    def db_for_read(self, model, **hints):
+        if model._meta.app_label == 'analytics':
+            return 'analytics'
+        return 'default'
+
+    def db_for_write(self, model, **hints):
+        if model._meta.app_label == 'analytics':
+            return 'analytics'
+        return 'default'
+
+# settings.py
+DATABASE_ROUTERS = ['myapp.routers.AnalyticsRouter']
+```
+
+#### Chạy migrate cho từng database
+
+```bash
+# Migrate database mặc định
+python manage.py migrate
+
+# Migrate database phụ
+python manage.py migrate --database=analytics
+```
+
+#### Ứng dụng thực tế
+
+| Use Case | Giải pháp |
+|---|---|
+| Read Replica (giảm tải) | Đọc từ replica, ghi vào primary |
+| Multi-tenant (mỗi khách một DB) | Router dựa trên request context |
+| Tách DB Analytics | Ghi log/report riêng, không ảnh hưởng DB chính |
 
 ## 7. Gợi ý lộ trình học Django tiếp theo
 

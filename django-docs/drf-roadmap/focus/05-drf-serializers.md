@@ -2,7 +2,37 @@
 
 Mình sẽ bám theo docs chính thức của Django REST Framework về Serializers, nhưng sẽ tiếp cận theo góc nhìn bạn đã biết `ModelForm` trong Django Template để dễ nối kiến thức cũ sang DRF.
 
-## 1. Serializer là gì?
+## 1. Bản chất cốt lõi
+
+Serializer đóng vai trò là **người phiên dịch** đứng giữa Backend (ngữ cảnh Python) và Client (ngữ cảnh môi trường mạng/trình duyệt). Nó làm 2 nhiệm vụ chính:
+
+**Serialization (Lượt đi — Đọc dữ liệu):**
+Nhặt dữ liệu cồng kềnh của Python (Model Instance, QuerySet) → Gọt giũa thành kiểu dữ liệu nguyên thủy (Dict, List) → Đưa cho DRF biến thành chuỗi JSON → Gửi về Client.
+
+**Deserialization (Lượt về — Ghi dữ liệu):**
+Nhận chuỗi JSON từ Client → Chuyển thành kiểu dữ liệu nguyên thủy → Kiểm tra tính hợp lệ (Validation) → Dựng lại thành Python Object để lưu vào Database.
+
+---
+
+## 2. Nguyên tắc giao tiếp qua mạng (HTTP)
+
+- Giao thức HTTP chỉ truyền tải **văn bản (text) hoặc byte**. Nó không thể truyền tải một "vật thể" (memory instance) đang nằm trong RAM của Server.
+- Client không hiểu Python. Ngôn ngữ giao tiếp chung duy nhất mà cả hai bên đồng thuận sử dụng trên web hiện nay là **JSON**.
+
+---
+
+## 3. Quy tắc trả về & không trả về
+
+| Loại dữ liệu | Trả về trực tiếp? | Lý do & Cách Serializer can thiệp |
+|---|---|---|
+| Dict, List, String, Số, Boolean | ✅ Có | Khớp 1-1 với chuẩn JSON, DRF tự biến thành chuỗi văn bản gửi đi. |
+| Django Model Instance (User, Task...) | ❌ Không | Chứa hàm nội bộ (`save()`, `delete()`), mật khẩu, trạng thái DB — JSON không biểu diễn được hàm. Serializer bóc tách, chỉ lấy các field cần thiết thành Dict. |
+| Datetime Object | ❌ Không | JSON không có kiểu dữ liệu thời gian. Serializer ép thành chuỗi định dạng chuẩn (VD: `"2026-06-16T09:00:00Z"`). |
+| File / Image Object | ❌ Không | Đây là "con trỏ" trỏ tới ổ cứng Server. Client không đọc được ổ cứng Server. Serializer trích xuất đường dẫn URL (String) để trả về. |
+
+---
+
+## 4. Serializer là gì?
 
 Trong Django Template, bạn đã quen với flow:
 `request.POST -> Form/ModelForm -> is_valid() -> cleaned_data -> save() -> render/redirect`
