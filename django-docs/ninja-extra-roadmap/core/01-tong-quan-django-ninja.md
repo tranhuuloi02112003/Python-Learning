@@ -101,7 +101,7 @@ DRF:    class TaskViewSet(ViewSet):  → nhiều method (get/post/put) sống ch
 Ninja:  def task_list(request): ...  → mỗi function là 1 endpoint riêng biệt, không chung class
 ```
 
-Vì không có class, nếu nhiều endpoint cần dùng chung logic (VD: cùng gọi `AuthService`, `StyleService`...), bạn phải tự khởi tạo lại service đó ở **từng function** — đây chính là hạn chế mà `ninja-extra` (bài 05 trong folder này) giải quyết.
+Vì không có class, nếu nhiều endpoint cần dùng chung logic (VD: cùng gọi `AuthService`, `TaskService`...), bạn phải tự khởi tạo lại service đó ở **từng function** — đây chính là hạn chế mà `ninja-extra` (bài 03 trong folder này) giải quyết.
 
 ---
 
