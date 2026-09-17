@@ -85,33 +85,20 @@ user_requests = emp.requests.all() # dùng tên của related_name để gọi
 
 ---
 
-## 5. Thao Tác Cơ Bản Với Datbase (QuerySet & CRUD)
+## 5. Truy vấn & CRUD — xem bài riêng
 
-Thay vì `SELECT/INSERT/UPDATE...`, Django dùng đối tượng **Manager (objects)**.
+Sau khi có model, mọi thao tác đọc/ghi đi qua **Manager** (`Model.objects`):
 
 ```python
-# 1. READ: Lấy dữ liệu
-all_emps = Employee.objects.all()                                 # Lấy hết
-active = Employee.objects.filter(is_active=True)                  # Mệnh đề WHERE
-emp = Employee.objects.get(id=1)                                  # Lấy duy nhất 1 bản (văng lỗi Exception nếu k có)
-emp_safe = Employee.objects.filter(id=999).first()                # Trả None nếu không tồn tại, an toàn hơn get()
-exists = Employee.objects.filter(email="a@b.com").exists()        # Hàm đếm tồn tại hay không True/False
-
-# 2. CREATE: Tạo mới
-new_emp = Employee.objects.create(email="user@dev.com", account_name="Dev")
-# --- Hoặc ---
-new_emp2 = Employee(email="test@dev.com")
-new_emp2.save() # Dùng kiểu này khi cần logic custom trước khi Save hoàn thành
-
-# 3. UPDATE: Sửa đổi
-emp.is_active = False
-emp.save()                                                        # Save update dòng hiện tại
-Employee.objects.filter(is_active=True).update(is_active=False)   # Bulk Update: Update nhiều Record trong 1 query
-
-# 4. DELETE: Xoá
-emp.delete()
-Employee.objects.filter(is_deleted=True).delete()                 # Bulk Delete
+Employee.objects.all()                    # READ
+Employee.objects.create(email="a@b.com")  # CREATE
+emp.save()                                # UPDATE
+emp.delete()                              # DELETE
 ```
+
+> Đó là toàn bộ những gì bài này cần nói về truy vấn. `filter`, lookup `__`,
+> `select_related`/`prefetch_related`, `annotate`/`Q`/`F`, chaining, lazy evaluation
+> — tất cả ở `06-orm.md`. Bài này chỉ lo phần **định nghĩa bảng**.
 
 ---
 
@@ -169,3 +156,7 @@ class Employee(models.Model):
 
 1. Ném thẳng Logic check quyền user hoặc view request chìm trong file hàm Models. Tách bạch Logic ra Service hoặc Controller/View.
 2. Bulk update/create `Model.objects.update(...)` sẽ KHÔNG trigger hàm `save()`. Nên chú ý cẩn dặn.
+
+---
+
+**Điều hướng:** ← `03-views.md` · `00-lo-trinh-doc.md` · `05-models-nang-cao.md` →

@@ -910,3 +910,7 @@ Sẽ học:
 - test business rule
 - test model clean()
 - test full_clean()
+
+---
+
+**Điều hướng:** ← `../advanced/17-compare-apiview-generic-view-viewset.md` · `../00-lo-trinh-doc.md` · `19-model-testing.md` →

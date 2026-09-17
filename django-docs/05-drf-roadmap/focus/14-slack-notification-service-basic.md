@@ -808,3 +808,7 @@ SlackNotifyService dùng SlackBaseService,
 SlackBaseService dùng WebClient,
 WebClient gọi Slack API bằng SLACK_BOT_TOKEN.
 ```
+
+---
+
+**Điều hướng:** ← `13-django-transactions-in-api-basic.md` · `../00-lo-trinh-doc.md` · `../advanced/15-genericapiview-and-mixins.md` →

@@ -431,3 +431,6 @@ và transaction thật sự đi vào nhánh rollback.
 
 Với Django `atomic`, bước đầu tiên khi đọc là nhìn xem block kết thúc bình thường hay có exception thoát ra.
 
+---
+
+**Điều hướng:** ← `12-django-orm-in-api-basic.md` · `../00-lo-trinh-doc.md` · `14-slack-notification-service-basic.md` →

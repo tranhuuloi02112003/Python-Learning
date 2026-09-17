@@ -521,3 +521,7 @@ Sau bài này, bạn cần chốt được:
 - APIView có content negotiation và exception handling của DRF.
 - APIView giúp tổ chức CRUD rõ hơn `@api_view`.
 - APIView nên học trước ViewSet vì ViewSet ẩn nhiều mapping hơn.
+
+---
+
+**Điều hướng:** ← `06-serializer-project-basic.md` · `../00-lo-trinh-doc.md` · `08-viewset-router-basic.md` →

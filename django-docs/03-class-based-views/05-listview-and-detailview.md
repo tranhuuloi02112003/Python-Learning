@@ -1796,3 +1796,7 @@ prefetch_related = tối ưu ManyToMany/reverse relation.
 ```
 
 ---
+
+---
+
+**Điều hướng:** ← `04-templateview-and-redirectview.md` · `00-lo-trinh-doc.md` · `06-createview-updateview-deleteview.md` →

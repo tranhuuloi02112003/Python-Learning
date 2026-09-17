@@ -790,3 +790,7 @@ Bài này giúp bạn hiểu vì sao API:
 - trả data theo user nào
 - bị `401` hay `403`
 - cần check quyền ở đâu
+
+---
+
+**Điều hướng:** ← `09-viewset-as-view-manual-mapping.md` · `../00-lo-trinh-doc.md` · `11-custom-response-base-class-basic.md` →

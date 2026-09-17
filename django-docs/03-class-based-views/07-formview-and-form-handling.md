@@ -1407,3 +1407,7 @@ Nếu form là ModelForm để create/update object, ưu tiên CreateView/Update
 ```
 
 ---
+
+---
+
+**Điều hướng:** ← `06-createview-updateview-deleteview.md` · `00-lo-trinh-doc.md` · `08-mixins-permissions-and-best-practices.md` →

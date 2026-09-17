@@ -185,3 +185,7 @@ Cần nhớ:
 - Function-based API dùng `if request.method == ...`.
 - APIView tách method thành `get()`, `post()`.
 - Project hiện tại không focus sâu vào `@api_view`, nên đọc lướt là đủ.
+
+---
+
+**Điều hướng:** ← `01-django-core-recap.md` · `../00-lo-trinh-doc.md` · `../focus/03-drf-request-response.md` →

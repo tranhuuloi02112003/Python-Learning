@@ -40,14 +40,15 @@ class Task(models.Model):
 
 ---
 
-## 3. Hệ thống "Chuyển nhà" (Migrations)
+## 3. Migrations — xem bài riêng
 
-Khi bạn thay đổi bản thiết kế ở `models.py`, Database không hề biết sự thay đổi đó. Bạn phải nói chuyện với Database thông qua 2 câu lệnh huyền thoại:
+Sửa `models.py` xong thì Database chưa biết gì cả. Hai lệnh nối code với DB:
 
-1.  `python manage.py makemigrations`:
-    - **Nghĩa là:** _"Này Django, tôi vừa sửa code Python đấy. Hãy đọc code và viết giùm tôi một tờ sớ (file migration) miêu tả những thay đổi đó ra ngôn ngữ mà DB hiểu được."_
-2.  `python manage.py migrate`:
-    - **Nghĩa là:** _"Này Django, hãy đem tờ sớ đó đưa cho Database thực thi đi (Tạo cột, xóa bảng, sửa kiểu dữ liệu...)."_
+- `makemigrations` — Django đọc code, sinh ra file migration mô tả thay đổi.
+- `migrate` — đem file đó cho Database thực thi.
+
+> Toàn bộ chi tiết (file migration trông thế nào, xử lý conflict, rollback,
+> so sánh với Liquibase/Flyway) nằm ở `07-migration.md`. Bài này chỉ tập trung vào truy vấn.
 
 ---
 
@@ -107,9 +108,6 @@ Chỉ cần thêm 2 dấu gạch dưới, ORM của Django sẽ cho bạn sức 
 - **Lazy Evaluation (Lười biếng thông minh):** Django ORM cực kỳ lười. Khi bạn viết dòng code trên, **nó chưa hề chạy xuống Database**. Nó chỉ đứng đợi đó. Chỉ khi nào bạn dùng vòng lặp `for` để in data ra hoặc ép kiểu `list(tasks)`, lúc đó nó mới thực sự "phi" xuống DB để lấy data. Điều này giúp tối ưu hiệu năng tối đa.
 
 ---
-
----
-
 ## 5. Cấp độ Nâng cao: Sự liên kết (Relationships)
 
 Sức mạnh khủng khiếp nhất của Database không nằm ở từng bảng rời rạc, mà ở cách chúng liên kết với nhau. Django ORM hỗ trợ 3 loại liên kết kinh điển nhất:
@@ -380,3 +378,7 @@ for field, value in data.items():
 - Nếu chỉ lặp qua `data`, Python chỉ trả về key.
 - `data.items()` lấy cả key và value.
 - `setattr(project, "name", "New Project")` tương đương `project.name = "New Project"`.
+
+---
+
+**Điều hướng:** ← `05-models-nang-cao.md` · `00-lo-trinh-doc.md` · `07-migration.md` →

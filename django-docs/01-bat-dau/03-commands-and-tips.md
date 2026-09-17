@@ -122,3 +122,7 @@ Nếu quên mật khẩu admin đã tạo:
 ```bash
 python manage.py changepassword [username]
 ```
+
+---
+
+**Điều hướng:** ← `02-apps-architecture.md` · `00-lo-trinh-doc.md` · →

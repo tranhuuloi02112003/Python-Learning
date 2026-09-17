@@ -52,6 +52,9 @@ Mỗi tầng có file `00-lo-trinh-doc.md` liệt kê chi tiết các bài bên 
 - Thư mục: `NN-ten-tang/` — `NN` là thứ tự đọc của tầng.
 - File bài học: `NN-ten-bai.md` — `NN` là thứ tự đọc **trong tầng đó**.
 - File `00-lo-trinh-doc.md` là mục lục, **không tính** là một bài học.
+- Cuối mỗi bài có thanh **Điều hướng** `← bài trước · mục lục · bài sau →`.
+- Bài nào trùng nội dung với bài khác thì **trỏ sang**, không chép lại — mỗi khái niệm
+  được dạy đầy đủ ở đúng một chỗ.
 - Tầng 05 và 06 chia thêm `core/` → `focus/` → `advanced/` → `test/`, nhưng số bài
   vẫn chạy liên tục xuyên qua các thư mục con (01→20 và 01→17), nên cứ đọc theo số.
 
@@ -59,4 +62,4 @@ Mỗi tầng có file `00-lo-trinh-doc.md` liệt kê chi tiết các bài bên 
 
 ## Việc Còn Dở
 
-- `03-class-based-views/08-mixins-permissions-and-best-practices.md` — file rỗng, chưa viết nội dung.
+- `03-class-based-views/08-mixins-permissions-and-best-practices.md` — mới có outline, chưa viết nội dung.

@@ -689,3 +689,7 @@ Bài này chưa cần thực hành sâu. Chỉ cần nhìn code và đọc đư�
 ```text
 URL -> HTTP method -> as_view mapping -> ViewSet method
 ```
+
+---
+
+**Điều hướng:** ← `08-viewset-router-basic.md` · `../00-lo-trinh-doc.md` · `10-authentication-permission-basic.md` →

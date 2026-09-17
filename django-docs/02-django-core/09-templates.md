@@ -135,3 +135,7 @@ Bạn gọi đường dẫn của file con. Django sẽ lấy nội dung file đ
 6.  **Templates:** Công xưởng giao diện.
 
 Giờ đây, bạn đã không còn là người "copy code tutorial" nữa, mà đã hiểu thực sự những gì đang diễn ra dưới gầm máy. Bạn đã sẵn sàng để quay lại và nâng cấp Todo App lên một tầm cao mới chưa?
+
+---
+
+**Điều hướng:** ← `08-forms.md` · `00-lo-trinh-doc.md` · `10-admin-panel.md` →

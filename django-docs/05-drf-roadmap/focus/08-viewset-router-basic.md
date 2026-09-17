@@ -432,3 +432,7 @@ Flow cần đọc được:
 ```text
 URL -> HTTP method -> as_view mapping -> ViewSet method
 ```
+
+---
+
+**Điều hướng:** ← `07-drf-apiview.md` · `../00-lo-trinh-doc.md` · `09-viewset-as-view-manual-mapping.md` →

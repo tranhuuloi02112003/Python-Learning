@@ -698,3 +698,7 @@ Sau bài này, bạn cần chốt:
 - `RetrieveUpdateDestroyAPIView` dùng cho detail/update/delete.
 - Nếu logic quá custom thì dùng APIView.
 - Nếu CRUD chuẩn thì dùng Generic Views hoặc sau này ViewSet/Router.
+
+---
+
+**Điều hướng:** ← `15-genericapiview-and-mixins.md` · `../00-lo-trinh-doc.md` · `17-compare-apiview-generic-view-viewset.md` →

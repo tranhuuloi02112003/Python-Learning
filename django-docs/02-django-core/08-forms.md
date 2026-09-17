@@ -399,3 +399,7 @@ Trong modal:
 ```
 
 sẽ submit tới URL đã truyền vào.
+
+---
+
+**Điều hướng:** ← `07-migration.md` · `00-lo-trinh-doc.md` · `09-templates.md` →

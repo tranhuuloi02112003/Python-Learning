@@ -727,3 +727,7 @@ Request/Response
 -> APIView
 -> CRUD
 ```
+
+---
+
+**Điều hướng:** ← `../core/02-api-view-and-url-flow.md` · `../00-lo-trinh-doc.md` · `04-response-status-error-flow.md` →

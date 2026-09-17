@@ -595,3 +595,7 @@ Django shell = chủ động hỏi backend/DB ngay tại chỗ.
 ```
 
 </details>
+
+---
+
+**Điều hướng:** ← `01-logger-vs-print.md` · `00-lo-trinh-doc.md` · →

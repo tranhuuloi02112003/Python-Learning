@@ -746,3 +746,7 @@ Sau bài này, bạn cần chốt được:
 - DRF default error thường dùng key `detail` hoặc field errors.
 - Giai đoạn học basic nên theo DRF default response trước.
 - Chưa nên custom format `data`/`message`/`errors` quá sớm.
+
+---
+
+**Điều hướng:** ← `03-drf-request-response.md` · `../00-lo-trinh-doc.md` · `05-drf-serializers.md` →

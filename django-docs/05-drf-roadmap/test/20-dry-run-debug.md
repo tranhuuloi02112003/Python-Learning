@@ -487,3 +487,7 @@ Nó đặc biệt hữu ích khi debug:
 - logic phụ thuộc settings/env
 
 Đây là kỹ năng rất thực tế khi làm Django backend.
+
+---
+
+**Điều hướng:** ← `19-model-testing.md` · `../00-lo-trinh-doc.md` · →

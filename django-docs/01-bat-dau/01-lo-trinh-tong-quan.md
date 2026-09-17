@@ -51,3 +51,7 @@ Bạn không cần học SQL, chỉ cần dùng code Python để thao tác dữ
 5. Thêm chút CSS (Bootstrap/Tailwind) cho đẹp mắt.
 
 Làm xong cái Todo List này là bạn chính thức "tốt nghiệp" khóa Django cơ bản và sẵn sàng chiến dự án lớn!
+
+---
+
+**Điều hướng:** ← · `00-lo-trinh-doc.md` · `02-apps-architecture.md` →

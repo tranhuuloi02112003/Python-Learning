@@ -614,3 +614,7 @@ class Task(models.Model):
     def is_completed(self):
         return self.status == self.Status.DONE
 ```
+
+---
+
+**Điều hướng:** ← `04-models.md` · `00-lo-trinh-doc.md` · `06-orm.md` →

@@ -62,3 +62,7 @@ Dưới đây là những "món đồ" phổ biến nhất nằm bên trong cái
 6.  **`request.COOKIES`**: Từ điển chứa các mẩu dữ liệu nhỏ (Cookies) mà trình duyệt của khách gửi lên.
 
 Hiểu sâu về `request`, bạn có thể lấy được bất kỳ thông tin nào từ trình duyệt của người dùng để xử lý logic cực kỳ tinh vi!
+
+---
+
+**Điều hướng:** ← · `00-lo-trinh-doc.md` · `02-urls.md` →

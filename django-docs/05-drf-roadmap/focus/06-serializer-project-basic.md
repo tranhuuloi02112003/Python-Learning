@@ -1075,3 +1075,7 @@ request.data
 -> serializer.data
 -> custom response
 ```
+
+---
+
+**Điều hướng:** ← `05-drf-serializers.md` · `../00-lo-trinh-doc.md` · `07-drf-apiview.md` →

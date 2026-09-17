@@ -79,30 +79,16 @@ Hàm View BẮT BUỘC phải trả về một đối tượng Response. Django 
 4. Bây giờ nếu User bấm F5, nó chỉ load lại trang chủ (GET), không hề gửi lại lệnh Thêm task nữa.
 
 ---
+## 3. Bước tiếp theo: Class-Based Views
 
+Khi dự án phình to, code CRUD lặp đi lặp lại: hàm nào cũng check `POST`,
+check `form.is_valid()`, `save()`, rồi `redirect()`. Django đã viết sẵn các class
+làm thay phần lặp đó — `ListView`, `DetailView`, `CreateView`, `UpdateView`, `DeleteView`.
+
+**Lộ trình:** rèn FBV (hàm) cho nhuần nhuyễn trước để hiểu bản chất luồng đi.
+Khi thấy chán vì viết lặp, đó là lúc sang tầng `03-class-based-views/`,
+nơi so sánh trực tiếp cùng một bài toán viết bằng FBV và bằng CBV.
 
 ---
 
-## 3. Tương lai: Class-Based Views (CBV)
-
-Khi dự án của bạn phình to, bạn sẽ nhận ra một điều đau khổ: Việc viết các tính năng CRUD (Thêm - Sửa - Xóa - Đọc) lặp đi lặp lại rất nhàm chán. Hàm nào cũng check POST, check form.is_valid(), save(), rồi redirect.
-
-Vì Python là ngôn ngữ Hướng đối tượng (OOP) cực mạnh, những người tạo ra Django đã viết sẵn các Class khổng lồ để làm thay bạn phần việc lặp đi lặp lại đó.
-
-Ví dụ, để viết tính năng "Liệt kê danh sách Task", thay vì phải tự rút dữ liệu rồi render như hàm `home_page`, bạn chỉ cần viết ĐÚNG 2 DÒNG CODE:
-
-```python
-from django.views.generic import ListView
-from .models import Task
-
-class TaskListView(ListView):
-    model = Task
-    template_name = 'tasks/list.html'
-```
-Bùm! 2 dòng code trên hoàn toàn tương đương với 10 dòng code trong Function-Based View. 
-Django đã đóng gói sẵn các Class cực xịn:
-*   **`ListView`**: Chuyên trị hiển thị danh sách (có sẵn chức năng chia trang - pagination).
-*   **`DetailView`**: Chuyên hiển thị thông tin 1 đối tượng.
-*   **`CreateView`, `UpdateView`, `DeleteView`**: Bao thầu trọn gói việc check POST, check Form, báo lỗi đỏ, lưu Database.
-
-**Lộ trình học:** Bạn cứ rèn luyện thật nhuần nhuyễn FBV (Hàm) để hiểu bản chất luồng đi đã. Khi nào thấy chán ngán với việc viết code lặp đi lặp lại, đó là lúc bạn sẵn sàng "giác ngộ" CBV.
+**Điều hướng:** ← `02-urls.md` · `00-lo-trinh-doc.md` · `04-models.md` →

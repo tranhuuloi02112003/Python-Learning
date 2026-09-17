@@ -85,3 +85,7 @@ urlpatterns = [
 ]
 ```
 Lúc này, bạn sẽ tự tạo một file `urls.py` mới nằm gọn trong thư mục `tasks/` để chuyên quản lý các luồng của riêng nó. Code sẽ cực kỳ gọn gàng và độc lập (Mô hình App-plugable).
+
+---
+
+**Điều hướng:** ← `01-request-response.md` · `00-lo-trinh-doc.md` · `03-views.md` →

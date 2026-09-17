@@ -960,3 +960,7 @@ Quy tắc thực tế:
 - Page chỉ render template -> `TemplateView`
 - URL chỉ redirect -> `RedirectView`
 - Page hiển thị object, list, form -> dùng generic view phù hợp hơn
+
+---
+
+**Điều hướng:** ← `03-view-as-view-dispatch-get-post.md` · `00-lo-trinh-doc.md` · `05-listview-and-detailview.md` →

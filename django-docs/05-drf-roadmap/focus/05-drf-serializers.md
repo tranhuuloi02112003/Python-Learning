@@ -692,3 +692,7 @@ Flow: PATCH /tasks/1/ -> get task -> validate partial data -> save/update -> ret
 15. `SerializerMethodField`.
 16. Nested serializer.
 17. Tách List/Detail/Create/Update serializer.
+
+---
+
+**Điều hướng:** ← `04-response-status-error-flow.md` · `../00-lo-trinh-doc.md` · `06-serializer-project-basic.md` →

@@ -716,3 +716,7 @@ Khi join dự án, bạn chỉ cần nhớ:
 - Muốn hiểu chính xác response trả gì thì mở base class ra đọc.
 - Custom decorator như `CheckDecorator` cũng không phải DRF gốc.
 - Muốn hiểu method bị bọc thế nào thì mở decorator ra đọc wrapper.
+
+---
+
+**Điều hướng:** ← `10-authentication-permission-basic.md` · `../00-lo-trinh-doc.md` · `12-django-orm-in-api-basic.md` →

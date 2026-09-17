@@ -474,3 +474,7 @@ Quy tắc thực tế:
 - `as_view()` = biến class thành callable để Django URL gọi được
 - Generic View = class view Django viết sẵn cho các case phổ biến
 - Mixin = class nhỏ để tái sử dụng behavior như login, permission
+
+---
+
+**Điều hướng:** ← · `00-lo-trinh-doc.md` · `02-function-based-view-vs-class-based-view.md` →

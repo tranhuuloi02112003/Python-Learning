@@ -800,3 +800,7 @@ print / CustomPrint
 ```
 
 cho debug tạm thời hoặc script nhỏ.
+
+---
+
+**Điều hướng:** ← · `00-lo-trinh-doc.md` · `02-django-shell-debug.md` →

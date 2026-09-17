@@ -88,3 +88,7 @@ Vì giao diện này có quyền lực chạm thẳng vào Database, các công 
     - Nhân viên Support/Ops chỉ được cấp tài khoản `Staff` với quyền hạn giới hạn thông qua cơ chế Group và Permission (Ví dụ: Chỉ có quyền Xem và Sửa Task, bị cấm Xóa).
 
 > **Tổng kết:** Django Admin là một "vũ khí hạng nặng" dạng Back-office. Nó sinh ra để Quản trị viên điều hành hệ thống dữ liệu một cách trực quan, nhanh chóng và cực kỳ tiết kiệm chi phí phát triển.
+
+---
+
+**Điều hướng:** ← `09-templates.md` · `00-lo-trinh-doc.md` · →

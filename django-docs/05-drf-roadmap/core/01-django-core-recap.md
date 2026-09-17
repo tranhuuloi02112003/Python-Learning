@@ -685,4 +685,6 @@ python manage.py showmigrations
 
 > ✅ **Nếu hiểu được cả 10 câu** → bạn đã sẵn sàng sang Phase 1 (ORM).
 
+---
 
+**Điều hướng:** ← · `../00-lo-trinh-doc.md` · `02-api-view-and-url-flow.md` →

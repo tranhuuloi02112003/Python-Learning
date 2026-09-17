@@ -800,3 +800,7 @@ Sau bài này, bạn cần chốt:
 Các phần như `get_serializer_context()`, `filter_queryset()`, `paginate_queryset()`, `perform_create()`, `perform_update()`, `perform_destroy()` là nhóm kiến thức deep-dive của `GenericAPIView` / Generic Views.
 
 Hiện tại chưa cần học sâu. Khi gặp case thực tế như cần truyền thêm `request` vào serializer, filter/pagination queryset, hoặc custom logic lúc create/update/delete, sẽ search docs chính thức DRF và update thêm vào file deep-dive riêng.
+
+---
+
+**Điều hướng:** ← `../focus/14-slack-notification-service-basic.md` · `../00-lo-trinh-doc.md` · `16-generic-class-based-views.md` →

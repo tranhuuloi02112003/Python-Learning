@@ -1076,3 +1076,7 @@ Chúng chỉ viết sẵn nhiều logic hơn ở các method như:
 - `form_valid()`
 - `form_invalid()`
 - `get_success_url()`
+
+---
+
+**Điều hướng:** ← `02-function-based-view-vs-class-based-view.md` · `00-lo-trinh-doc.md` · `04-templateview-and-redirectview.md` →

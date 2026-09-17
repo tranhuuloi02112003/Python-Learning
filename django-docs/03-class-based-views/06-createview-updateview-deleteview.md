@@ -1825,3 +1825,7 @@ DeleteView nên xóa bằng POST, không xóa bằng GET.
 ```
 
 ---
+
+---
+
+**Điều hướng:** ← `05-listview-and-detailview.md` · `00-lo-trinh-doc.md` · `07-formview-and-form-handling.md` →

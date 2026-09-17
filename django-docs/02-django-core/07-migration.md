@@ -17,7 +17,6 @@ Lệnh này có bản chất là **đồng bộ hóa các Model trong code vào 
 ---
 
 
-
 ## 3. Quy trình Migration trong Django (Khác với Java)
 
 Trong Java, bạn thường viết SQL thẳng hoặc file XML cho Flyway. Trong Django, quy trình theo hướng **"Code First"** — bạn viết Model bằng Python, Django tự sinh SQL.
@@ -301,3 +300,7 @@ python manage.py migrate --database=analytics
 - **Cơ bản:** Model, View, Template (MVT Pattern), URL routing, Django Admin.
 - **Trung cấp:** Django REST Framework (DRF), Serializer, Authentication (Token/JWT).
 - **Nâng cao:** Celery (background tasks), Django Channels (WebSocket), Custom Management Commands.
+
+---
+
+**Điều hướng:** ← `06-orm.md` · `00-lo-trinh-doc.md` · `08-forms.md` →

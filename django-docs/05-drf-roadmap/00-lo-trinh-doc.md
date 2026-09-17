@@ -147,293 +147,24 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 ## Phần 3: Lộ Trình Học – 6 Phase
 
-### Phase 0: Ôn Lại ORM Chắc ⭐⭐⭐
+Mỗi phase dưới đây **đã có bài riêng** trong roadmap này. Bảng sau là bản đồ phase → bài;
+nội dung chi tiết nằm ở file được trỏ tới, không chép lại ở đây.
 
-> **Đây là phần QUAN TRỌNG NHẤT.** Dù Template hay DRF, ORM là nơi bạn sẽ code nhiều nhất.
+| Phase | Mục tiêu | Bài đọc |
+|:--:|:--|:--|
+| 0 | Ôn ORM cho chắc: `filter`/lookup, `related_name`, `select_related`/`prefetch_related`, `annotate`/`Q`/`F`, `transaction.atomic()` | `02-django-core/06-orm.md` (nền tảng)<br>`focus/12-django-orm-in-api-basic.md`<br>`focus/13-django-transactions-in-api-basic.md` |
+| 1 | API flow cơ bản: `request.data`, `query_params`, `Response()`, status code | `core/02-api-view-and-url-flow.md`<br>`focus/03-drf-request-response.md`<br>`focus/04-response-status-error-flow.md` |
+| 2 | Serializer thay `ModelForm` | `focus/05-drf-serializers.md`<br>`focus/06-serializer-project-basic.md` |
+| 3 | Views: `APIView` → `ViewSet` → `Router` → Generic | `focus/07-drf-apiview.md`<br>`focus/08-viewset-router-basic.md`<br>`focus/09-viewset-as-view-manual-mapping.md`<br>`advanced/15` → `advanced/17` |
+| 4 | Permission / Authentication — ai được gọi API nào | `focus/10-authentication-permission-basic.md` |
+| 5 | Pagination / Filter / Search | *Chưa có bài riêng — nội dung nằm ngay dưới* |
 
-**Nhóm 1 – Query cơ bản (đã biết, ôn lại):**
-
-```python
-Model.objects.all()
-Model.objects.filter(status="active")
-Model.objects.exclude(status="archived")
-Model.objects.get(id=1)                    # Raise DoesNotExist nếu không có
-Model.objects.filter(id=999).first()       # Trả None nếu không có
-```
-
-**Nhóm 2 – Lookup nâng cao:**
-
-```python
-# Pattern: field__lookup=value
-Task.objects.filter(title__icontains="bug")          # LIKE '%bug%'
-Task.objects.filter(created_at__gte=start_date)      # >= ngày
-Task.objects.filter(status__in=["active", "pending"]) # IN list
-
-# Pattern: relation__field__lookup=value (query xuyên bảng)
-Task.objects.filter(project__name__icontains="web")   # Query qua ForeignKey
-```
-
-**Nhóm 3 – Quan hệ Model:**
-
-```python
-# ForeignKey + related_name
-class Task(models.Model):
-    project = models.ForeignKey(Project, related_name="tasks", on_delete=models.CASCADE)
-
-# Chiều thuận:  task.project.name
-# Chiều ngược:  project.tasks.all()
-# Trong annotate: Count("tasks")  ← dùng related_name
-```
-
-**Nhóm 4 – Tối ưu query (N+1 problem):**
-
-```python
-# ForeignKey / OneToOne → select_related (SQL JOIN, 1 query)
-Task.objects.select_related("project")
-
-# ManyToMany / Reverse FK → prefetch_related (2 query riêng, ghép trong Python)
-Project.objects.prefetch_related("tasks")
-```
-
-**Nhóm 5 – Annotate / Q / F (HAY GẶP trong API list/filter/search):**
-
-```python
-from django.db.models import Count, Q, F
-
-# Thêm field tính toán tạm
-Project.objects.annotate(task_count=Count("tasks"))
-
-# OR condition
-Task.objects.filter(Q(title__icontains="bug") | Q(description__icontains="bug"))
-
-# Update dựa trên giá trị hiện tại (không kéo về Python)
-Task.objects.filter(id=1).update(priority=F("priority") + 1)
-```
-
-**Nhóm 6 – Transaction khi write API:**
-
-```python
-from django.db import transaction
-
-with transaction.atomic():
-    project.save()
-    Task.objects.bulk_create(new_tasks)
-```
-
-Khi một API create/update nhiều record liên quan nhau, đọc thêm:
-`focus/13-django-transactions-in-api-basic.md` (cùng roadmap).
+> **Phase 0 quan trọng nhất.** Dù làm Template hay API, ORM là nơi bạn code nhiều nhất.
+> Học Serializer mà ORM chưa chắc thì sẽ tắc ở mọi API list/filter.
 
 ---
 
-### Phase 1: API Flow Cơ Bản
-
-> **Mục tiêu:** Hiểu API nhận gì, trả gì.
-
-**Học:**
-
-| Concept | Ý nghĩa |
-|:--------|:---------|
-| HTTP Methods | `GET` (đọc), `POST` (tạo), `PUT` (update toàn bộ), `PATCH` (update 1 phần), `DELETE` (xóa) |
-| `request.data` | Body data (thay `request.POST`) – DRF tự parse JSON |
-| `request.query_params` | URL params (giống `request.GET`) |
-| `Response(data, status)` | Trả JSON + HTTP status code |
-| Status codes | `200` OK, `201` Created, `400` Bad Request, `404` Not Found, `500` Server Error |
-
-**Ví dụ nhỏ nhất:**
-
-```python
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
-class HelloView(APIView):
-    def get(self, request):
-        return Response(
-            {"message": "Hello from DRF!"},
-            status=status.HTTP_200_OK
-        )
-
-    def post(self, request):
-        name = request.data.get("name")        # Thay request.POST.get("name")
-        return Response(
-            {"message": f"Created: {name}"},
-            status=status.HTTP_201_CREATED
-        )
-```
-
----
-
-### Phase 2: Serializer
-
-> **Mục tiêu:** Thay thế `ModelForm`. Validate data + convert Model ↔ JSON.
-
-**Mapping tư duy từ ModelForm:**
-
-```python
-# ── ModelForm (đã biết) ──
-class TaskForm(forms.ModelForm):
-    class Meta:
-        model = Task
-        fields = ["title", "status", "project"]
-
-# form.is_valid() → validate
-# form.save()     → lưu vào DB
-# form.errors     → lỗi validation
-
-# ── Serializer (sẽ học) ──
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = ["id", "title", "status", "project"]
-        read_only_fields = ["id"]
-
-# serializer.is_valid()  → validate (GIỐNG)
-# serializer.save()      → lưu vào DB (GIỐNG)
-# serializer.errors      → lỗi validation (GIỐNG)
-# serializer.data        → dict/JSON output (MỚI – ModelForm không có)
-```
-
-**Các khái niệm cần học:**
-
-```python
-class TaskSerializer(serializers.ModelSerializer):
-    # SerializerMethodField – field tính toán custom
-    project_name = serializers.SerializerMethodField()
-
-    # Source – lấy field từ quan hệ
-    owner_email = serializers.CharField(source="owner.email", read_only=True)
-
-    class Meta:
-        model = Task
-        fields = ["id", "title", "project", "project_name", "owner_email", "status"]
-        read_only_fields = ["id"]                # Không cho update qua API
-
-    def get_project_name(self, obj):
-        """Hàm cho SerializerMethodField – tên = get_<field_name>"""
-        return obj.project.name if obj.project else None
-
-    def validate_title(self, value):
-        """Validate từng field – giống clean_<field>() trong ModelForm"""
-        if len(value) < 3:
-            raise serializers.ValidationError("Title phải >= 3 ký tự")
-        return value
-
-    def validate(self, data):
-        """Validate toàn bộ – giống clean() trong ModelForm"""
-        if data.get("status") == "done" and not data.get("project"):
-            raise serializers.ValidationError("Task done phải có project")
-        return data
-```
-
-**Sử dụng trong view:**
-
-```python
-# Serialize (Model → JSON) – khi GET
-serializer = TaskSerializer(task)                    # 1 object
-serializer = TaskSerializer(queryset, many=True)     # nhiều objects
-return Response(serializer.data)
-
-# Deserialize (JSON → Model) – khi POST/PUT
-serializer = TaskSerializer(data=request.data)       # Tạo mới
-serializer = TaskSerializer(task, data=request.data) # Update
-if serializer.is_valid():
-    serializer.save()
-    return Response(serializer.data, status=201)
-return Response(serializer.errors, status=400)
-```
-
----
-
-### Phase 3: Views – APIView / ViewSet
-
-> **Mục tiêu:** Hiểu các kiểu view trong DRF và cách routing.
-
-**Từ đơn giản → phức tạp:**
-
-```txt
-APIView        → Tự viết get(), post(), put(), delete()
-                 Giống FBV nhưng dạng class.
-
-GenericAPIView → Thêm queryset, serializer_class, lookup_field
-                 Có sẵn get_queryset(), get_object()...
-
-ViewSet        → Nhóm nhiều action vào 1 class
-                 Dùng .as_view({"get": "list", "post": "create"})
-
-ModelViewSet   → ViewSet + tự động CRUD đầy đủ
-                 list, create, retrieve, update, destroy có sẵn
-```
-
-**Ví dụ ViewSet (hay gặp trong dự án thực tế):**
-
-```python
-# views.py
-class TaskViewSet(GenericViewSet):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-
-    def list(self, request, *args, **kwargs):
-        """GET /api/tasks/"""
-        queryset = self.get_queryset().select_related("project")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({"data": serializer.data})
-
-    def create(self, request, *args, **kwargs):
-        """POST /api/tasks/"""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"data": serializer.data}, status=201)
-
-# urls.py
-urlpatterns = [
-    path("list", TaskViewSet.as_view({"get": "list"})),
-    path("create", TaskViewSet.as_view({"post": "create"})),
-]
-```
-
-**Dự án thực tế thường dùng custom base class:**
-
-```python
-# Team tự viết base class bọc lại DRF
-class TaskView(ResponseStatus):                      # ← Custom base class
-    def get_task_list(self, request, *args, **kwargs):
-        queryset = Task.objects.all()
-        serializer = TaskListSerializer(queryset, many=True)
-        return self._response_status_200(data_return=serializer.data)  # ← Custom response
-
-# ResponseStatus → kế thừa từ BaseHandleAPI → kế thừa từ GenericViewSet
-# Bản chất vẫn là DRF, chỉ bọc thêm helper
-```
-
-> ⚠️ **Thứ tự học:** Hiểu `GenericViewSet` trước → rồi mới đọc custom base class của team.
-
----
-
-### Phase 4: Permission / Authentication
-
-> **Mục tiêu:** Hiểu ai được gọi API nào.
-
-```python
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
-class TaskViewSet(GenericViewSet):
-    permission_classes = [IsAuthenticated]     # Phải login mới gọi được
-
-    def list(self, request, *args, **kwargs):
-        user = request.user                    # User hiện tại (từ token)
-        queryset = Task.objects.filter(owner=user)
-        ...
-```
-
-**Các câu hỏi hay gặp khi debug:**
-- `request.user` là ai? → Check authentication
-- User có quyền gọi API này không? → Check `permission_classes`
-- API trả `401` hay `403`? → `401` = chưa login, `403` = login rồi nhưng không có quyền
-
----
-
-### Phase 5: Pagination / Filter / Search
+### Phase 5: Pagination / Filter / Search (chưa có bài riêng)
 
 > **Mục tiêu:** API list thực tế luôn cần phân trang, lọc, tìm kiếm.
 
@@ -522,37 +253,25 @@ Bước 5: models.py → DepartmentInfo
 
 > **Học SAU khi đã hiểu DRF cơ bản.** Không nhảy vào đây trước.
 
-Dự án thực tế thường có custom base class bọc lại DRF:
-
-```txt
-__Common/viewsets/_base_viewset.py    → BaseHandleAPI (kế thừa GenericViewSet)
-__Common/viewsets/response_status.py  → ResponseStatus (kế thừa BaseHandleAPI)
-```
-
-**Chuỗi kế thừa:**
+Dự án thực tế thường bọc DRF thêm một lớp base class của team:
 
 ```txt
 DRF GenericViewSet
-    └── BaseHandleAPI        ← Team tự viết: thêm helper xử lý chung
-        └── ResponseStatus   ← Team tự viết: chuẩn hóa response format
+    └── BaseHandleAPI        ← Team tự viết: helper xử lý chung
+        └── ResponseStatus   ← Team tự viết: chuẩn hóa format response
             └── DepartmentView   ← View cụ thể của module
 ```
 
-**Các helper cần hiểu:**
+**Thứ tự đọc khi gặp code kiểu này:**
 
-| Helper | Chức năng |
-|:-------|:----------|
-| `_response_status_200(data_return=...)` | Trả response thành công chuẩn |
-| `_response_status_400_bad_request(...)` | Trả response lỗi validation |
-| `ProcessData` | Xử lý/transform data trước khi trả |
-| `pagination_list_data(...)` | Phân trang kết quả list |
-| `get_filter_obj(...)` | Lọc queryset theo query params |
+1. Hiểu `GenericViewSet` gốc của DRF là gì (Phase 3).
+2. Mở `_base_viewset.py` → xem `BaseHandleAPI` thêm gì.
+3. Mở `response_status.py` → xem `ResponseStatus` bọc response ra sao.
+4. Sau đó mới đọc view cụ thể của module.
 
-**Thứ tự đọc:**
-1. Hiểu `GenericViewSet` gốc của DRF là gì
-2. Mở `_base_viewset.py` → xem `BaseHandleAPI` thêm gì
-3. Mở `response_status.py` → xem `ResponseStatus` bọc response như nào
-4. Sau đó mới đọc view cụ thể của module
+> Danh sách helper (`_response_status_200`, `ProcessData`, `pagination_list_data`,
+> `get_filter_obj`...), cách trace chúng, và 3 chỗ dễ nhầm khi đọc code kiểu này
+> được giải thích đầy đủ ở `focus/11-custom-response-base-class-basic.md`.
 
 ---
 

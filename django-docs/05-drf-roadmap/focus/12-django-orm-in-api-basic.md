@@ -1420,3 +1420,7 @@ Bạn sẽ hay gặp pattern này khi cần:
 - Làm tròn trong DB (`Round`)
 - Ép về int để cộng/so sánh/sort (`Cast(..., IntegerField())`)
 - Bọc lại để Django biết type cuối (`ExpressionWrapper(..., output_field=...)`)
+
+---
+
+**Điều hướng:** ← `11-custom-response-base-class-basic.md` · `../00-lo-trinh-doc.md` · `13-django-transactions-in-api-basic.md` →

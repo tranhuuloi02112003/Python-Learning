@@ -58,3 +58,7 @@ products/
 
 1. **Đăng ký App:** Sau khi dùng lệnh `startapp`, bạn **bắt buộc** phải khai báo tên App đó vào mục `INSTALLED_APPS` trong file `settings.py`. Nếu không, Django sẽ không nhận ra module bạn vừa tạo.
 2. **Mỗi App một URL:** Hãy tạo file `urls.py` riêng bên trong mỗi App và "include" nó vào file `urls.py` tổng của Project. Điều này giúp code cực kỳ sạch và dễ quản lý đường dẫn.
+
+---
+
+**Điều hướng:** ← `01-lo-trinh-tong-quan.md` · `00-lo-trinh-doc.md` · `03-commands-and-tips.md` →

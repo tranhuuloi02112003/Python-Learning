@@ -53,294 +53,67 @@ Các tầng:
 
 ---
 
-## 2. APIView là gì trong bản đồ này?
+## 2. Hình dạng code của từng tầng
 
-`APIView` là tầng rõ nhất.
+Mỗi tầng đã có bài riêng dạy sâu. Ở đây chỉ để cạnh nhau cho thấy code **ngắn dần** như thế nào.
 
-Ví dụ:
+**`APIView` — tự viết mọi thứ** → chi tiết: `../focus/07-drf-apiview.md`
 
 ```python
-class TaskAPIView(APIView):
+class TaskListAPIView(APIView):
     def get(self, request):
-        ...
-
-    def post(self, request):
-        ...
+        tasks = Task.objects.all()
+        return Response(TaskSerializer(tasks, many=True).data)
 ```
 
-Tư duy:
-
-```text
-GET  -> get()
-POST -> post()
-```
-
-Bạn tự xử lý:
-
-- query database
-- khởi tạo serializer
-- validate
-- save/delete
-- return `Response`
-- status code
-
-Nên dùng APIView khi:
-
-- API rất custom.
-- API không map rõ với một model.
-- Endpoint dạng report/dashboard/webhook/import/export.
-- Bạn muốn flow cực kỳ explicit.
-
-Ví dụ:
-
-```text
-/api/dashboard/summary/
-/api/reports/monthly/
-/api/webhook/payment/
-```
-
----
-
-## 3. GenericAPIView + Mixins là gì?
-
-Phần này đã có bài riêng:
-
-```text
-advanced/15-genericapiview-and-mixins.md
-```
-
-Ở đây chỉ cần hiểu ngắn gọn:
-
-```text
-GenericAPIView = APIView + helper cho queryset/serializer/object lookup
-Mixins = action CRUD có sẵn
-```
-
-`GenericAPIView` thêm các helper:
-
-- `queryset`
-- `serializer_class`
-- `get_queryset()`
-- `get_serializer()`
-- `get_object()`
-
-Mixins thêm các action:
-
-- `list()`
-- `create()`
-- `retrieve()`
-- `update()`
-- `partial_update()`
-- `destroy()`
-
-Nhưng bạn vẫn phải tự map HTTP method:
+**`GenericAPIView` + Mixins — có helper, còn tự map method** → `15-genericapiview-and-mixins.md`
 
 ```python
 class TaskListView(ListModelMixin, CreateModelMixin, GenericAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def get(self, request, *a, **kw):  return self.list(request, *a, **kw)
+    def post(self, request, *a, **kw): return self.create(request, *a, **kw)
 ```
 
-Cần nhớ:
-
-```text
-GenericAPIView + Mixins = tự ghép nền + action + method mapping.
-```
-
-Giai đoạn join project hiện tại: chỉ cần biết khái niệm, chưa cần đào sâu.
-
----
-
-## 4. Generic Class-Based Views là gì?
-
-Phần này đã có bài riêng:
-
-```text
-advanced/16-generic-class-based-views.md
-```
-
-Ở đây chỉ cần hiểu:
-
-```text
-Generic Class-Based Views
-= GenericAPIView + Mixins + DRF map sẵn HTTP method
-```
-
-Ví dụ:
+**Generic Class-Based Views — DRF map sẵn method** → `16-generic-class-based-views.md`
 
 ```python
-class TaskListCreateView(generics.ListCreateAPIView):
+class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 ```
 
-DRF đã map sẵn:
-
-```text
-GET  -> list()
-POST -> create()
-```
-
-Ví dụ detail:
-
-```python
-class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-```
-
-DRF đã map sẵn:
-
-```text
-GET    -> retrieve()
-PUT    -> update()
-PATCH  -> partial_update()
-DELETE -> destroy()
-```
-
-Nên dùng Generic Views khi:
-
-- CRUD khá chuẩn.
-- Muốn endpoint rõ.
-- Không muốn viết lặp `get`, `post`, `put`, `delete`.
-
-Nhưng project hiện tại của bạn không focus nhiều vào style này, nên để sau.
-
----
-
-## 5. ViewSet là gì?
-
-`ViewSet` gom các action liên quan tới cùng một resource vào một class.
-
-Ví dụ:
+**`ViewSet` — gom mọi action của một resource vào một class** → `../focus/08-viewset-router-basic.md`
 
 ```python
 class TaskViewSet(ViewSet):
-    def list(self, request):
-        ...
-
-    def create(self, request):
-        ...
-
-    def retrieve(self, request, pk=None):
-        ...
+    def list(self, request): ...
+    def retrieve(self, request, pk=None): ...
+    def create(self, request): ...
 ```
 
-Điểm khác với APIView:
-
-```text
-APIView dùng get/post/put/delete.
-ViewSet dùng list/create/retrieve/update/partial_update/destroy.
-```
-
-Mapping tư duy:
-
-| HTTP/API | ViewSet action |
-|:---|:---|
-| `GET /tasks/` | `list()` |
-| `POST /tasks/` | `create()` |
-| `GET /tasks/<pk>/` | `retrieve()` |
-| `PUT /tasks/<pk>/` | `update()` |
-| `PATCH /tasks/<pk>/` | `partial_update()` |
-| `DELETE /tasks/<pk>/` | `destroy()` |
-
-Nên dùng ViewSet khi:
-
-- API xoay quanh một resource.
-- Có nhiều action liên quan cùng một model/domain.
-- Muốn gom logic vào một class.
-- Project dùng style `ViewSet.as_view({...})`.
-
-Với project hiện tại, đây là phần cần ưu tiên hơn Generic Views.
-
----
-
-## 6. Router là gì?
-
-Router không phải ViewSet.
-
-Router là công cụ tự sinh URL cho ViewSet.
-
-Ví dụ:
+**Router — tự sinh URL cho ViewSet** → `../focus/08-viewset-router-basic.md`
 
 ```python
+router = DefaultRouter()
 router.register("tasks", TaskViewSet, basename="task")
+# GET /tasks/ -> list() ; GET /tasks/1/ -> retrieve() ; POST /tasks/ -> create()
 ```
 
-Router tự sinh:
-
-```text
-GET    /tasks/       -> list()
-POST   /tasks/       -> create()
-GET    /tasks/<pk>/  -> retrieve()
-PUT    /tasks/<pk>/  -> update()
-PATCH  /tasks/<pk>/  -> partial_update()
-DELETE /tasks/<pk>/  -> destroy()
-```
-
-Cần phân biệt:
-
-```text
-ViewSet = nơi viết action.
-Router  = nơi tự sinh URL và tự map method vào action.
-```
-
-Project hiện tại của bạn không phụ thuộc Router nhiều, vì hay dùng manual mapping:
+**Manual mapping — dùng ViewSet nhưng tự chọn URL** → `../focus/09-viewset-as-view-manual-mapping.md`
 
 ```python
-SomeViewSet.as_view({
-    "get": "some_business_method",
-})
+path("tasks/", TaskViewSet.as_view({"get": "list", "post": "create"})),
 ```
+
+> Điểm mấu chốt: **Router không thay ViewSet, nó chỉ thay `urls.py`.**
+> Bỏ Router đi thì ViewSet vẫn chạy — chỉ là bạn tự map bằng `as_view({...})`.
 
 ---
 
-## 7. Manual Mapping Nằm Ở Đâu?
-
-Manual mapping là cách dùng ViewSet nhưng không dùng Router.
-
-Ví dụ:
-
-```python
-TaskViewSet.as_view({
-    "get": "list",
-    "post": "create",
-})
-```
-
-Hoặc theo business method:
-
-```python
-DailyReportViewSet.as_view({
-    "get": "get_task_logged",
-})
-```
-
-Tức là:
-
-```text
-ViewSet vẫn là ViewSet.
-Nhưng URL/action không do Router sinh tự động.
-Bạn tự khai báo mapping trong urls.py.
-```
-
-Phần này đã có bài riêng:
-
-```text
-focus/09-viewset-as-view-manual-mapping.md
-```
-
-Đây là bài quan trọng với project hiện tại.
-
----
-
-## 8. Bảng So Sánh Nhanh
+## 3. Bảng So Sánh Nhanh
 
 | Tầng | Bạn viết gì? | URL/mapping | Khi nào dùng? |
 |:---|:---|:---|:---|
@@ -352,7 +125,7 @@ focus/09-viewset-as-view-manual-mapping.md
 
 ---
 
-## 9. Chọn Cái Nào Trong Project Hiện Tại?
+## 4. Chọn Cái Nào Trong Project Hiện Tại?
 
 Với project hiện tại, ưu tiên đọc theo thứ tự:
 
@@ -382,7 +155,7 @@ SomeViewSet.as_view({
 
 ---
 
-## 10. Kết Luận
+## 5. Kết Luận
 
 Cần chốt:
 
@@ -399,3 +172,7 @@ Với project hiện tại:
 Đọc kỹ APIView + ViewSet manual mapping.
 GenericAPIView / Generic Views / Router để hiểu nền, đọc sau.
 ```
+
+---
+
+**Điều hướng:** ← `16-generic-class-based-views.md` · `../00-lo-trinh-doc.md` · `../test/18-testing-foundation.md` →
